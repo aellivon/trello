@@ -1,5 +1,4 @@
 import socket
-
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
@@ -11,7 +10,7 @@ from .forms import SignUpForm, UserLogInForm
 from .models import Profile
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from django.shortcuts import get_object_or_404
+
 
 class SignUpView(TemplateView):
     """
@@ -22,7 +21,8 @@ class SignUpView(TemplateView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('users:home'))
+            return HttpResponseRedirect(reverse('boards:home', kwargs={'username':\
+                self.request.user.get_username()}))
         else:
             form = self.form()
             context = {'form': form}
@@ -50,7 +50,8 @@ class LogInView(TemplateView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('users:home'))
+            return HttpResponseRedirect(reverse('boards:home' , kwargs={'username':\
+                self.request.user.get_username()}))
         else:
             form = self.form()
             context = {'form': form}
@@ -58,14 +59,16 @@ class LogInView(TemplateView):
 
     def post(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('users:home'))
+            return HttpResponseRedirect(reverse('boards:home', kwargs={'username':\
+                self.request.user.get_username()}))
         else:
             form = self.form(self.request.POST) 
             if form.is_valid():
                 user = form.login()
                 if user is not None:
                     login(self.request, user)
-                    return HttpResponseRedirect(reverse('users:home'))
+                    return HttpResponseRedirect(reverse('boards:home', kwargs={'username':\
+                self.request.user.get_username()}))
             context = {'form': form}
 
             return render(self.request, self.template_name, context)
@@ -76,17 +79,5 @@ class LogOutView(TemplateView):
     def get(self, *args,** kwargs):
         logout(self.request)
         return HttpResponseRedirect(reverse('users:log_in'))
-
-class IndexView(TemplateView):
-    """
-        Views for the Sign Up Page
-    """
-    template_name = "users/index.html"
-
-    def get(self, *args,** kwargs):
-        if self.request.user.is_authenticated:
-            return render(self.request, self.template_name, {})
-        else:
-            return HttpResponseRedirect(reverse('users:log_in'))
 
 

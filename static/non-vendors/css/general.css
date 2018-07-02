@@ -14,6 +14,61 @@ body {
   
 }
 
+.board-text{
+	margin-top:100px;
+}
+
+.create-new-board{
+	margin-top:100px;
+	color:black;
+}
+
+.box-row{
+	text-align:center;
+	margin-bottom: 10px;
+}
+
+hr.border{
+	border-top: 2px solid #888888;
+	margin-top:0px;
+	width: 100%;
+}
+
+.box-board{
+
+	margin: 15px;
+	margin-left: 27px;
+	background-color: #cccccc;
+	width: 250px;
+	height: 250px;
+
+}
+
+.box-board-has-content{
+	background-color: #323232;
+
+}
+
+.custom-index-title{
+	margin-top: 10px;
+}
+
+.custom_link a:hover{
+	color:white;
+}
+
+.custom-navbar-element{
+	color:#e5e5e5;
+}
+
+.custom-navbar{
+	background-color: #026aa7;
+}
+
+.custom-left-drop-down{
+	right:0;
+}
+
 .validation-title{
 	text-align: center;
 }
