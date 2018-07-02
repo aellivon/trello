@@ -3,17 +3,17 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from .models import Board, BoardMember
-from .forms import IndexModalForm
+from .forms import BoardModalForm
 from annoying.functions import get_object_or_None
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
 from django.shortcuts import reverse
 
 class IndexView(TemplateView):
     """
-        Views for the Sign Up Page
+        Views for the Index Page
     """
     template_name = "boards/index.html"
-    form = IndexModalForm
+    form = BoardModalForm
     def get(self, *args,** kwargs):
         if self.request.user.is_authenticated:
             context = self.form()
@@ -50,3 +50,18 @@ class IndexView(TemplateView):
         else:
             return HttpResponseRedirect(reverse('users:log_in'))
 
+class BoardView(TemplateView):
+    template_name = "boards/boards.html"
+    form = BoardModalForm
+
+    def get(self, *args,** kwargs):
+        if self.request.user.is_authenticated:
+            return render(self.request, self.template_name, {})
+        else:
+            return HttpResponseRedirect(reverse('users:log_in'))
+    
+    def post(self, *args,** kwargs):
+        if self.request.user.is_authenticated:
+            return render(self.request, self.template_name, {})
+        else:
+            return HttpResponseRedirect(reverse('users:log_in'))

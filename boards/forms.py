@@ -1,7 +1,7 @@
 from django import forms
 from .models import Board, BoardMember
 
-class IndexModalForm(forms.Form):
+class BoardModalForm(forms.Form):
 	board_name = forms.CharField(max_length=30,\
         required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
 
