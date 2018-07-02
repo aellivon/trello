@@ -1,0 +1,118 @@
+/*@font-face {
+  font-family: 'HelveticaNeue';
+  src: url('../static/non-vendors/fonts/HelveticaNeue.tff')  format("truetype"),
+       local('abc');
+}*/
+
+html,body {
+  height:100%;
+  width:100%;
+  margin:0;
+}
+body {
+  display:flex;
+  
+}
+
+.validation-title{
+	text-align: center;
+}
+
+.user-validation-title{
+	margin-top: 20%;
+}
+
+.error-box{
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.sign-up-title{
+	font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+/*	font-family: 'HelveticaNeue';
+  	src: url('../static/non-vendors/fonts/HelveticaNeue.tff')  format("truetype"),
+       local('HelveticaNeue');*/
+	font-weight: bold;
+	margin-top: 10%;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+
+
+.log-in-title{
+	font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+/*	font-family: 'HelveticaNeue';
+  	src: url('../static/non-vendors/fonts/HelveticaNeue.tff')  format("truetype"),
+       local('HelveticaNeue');*/
+	font-weight: bold;
+	margin-top: 20%;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+
+.sign-up-sub{
+	margin-top: 0px;
+	padding-top: 0px;
+	margin-bottom: 0px;
+	padding-bottom:0px;
+}
+
+.login-button{
+	margin-top: 10px;
+}
+
+
+.form-manipulation-class{
+	height: 72%;
+}
+
+.log-in-container{
+	margin-top: 0px;
+	padding-top: 0px;
+}
+
+.log-in-division{
+	margin-top: 0px;
+	border-color: gray;
+	padding-top: 10px;
+	padding-bottom: 50px;
+	background-color: #F8F8F8;
+}
+
+.log-in-row{
+	margin-top: 5%;
+}
+
+.title{
+	width: 100%;
+	text-align: center;
+	font-size: 20px;
+	margin-bottom: 30px;
+
+}
+
+.form-division{
+	margin-left: 10%;
+	margin-right: 10%;
+}
+
+.button-margin{
+
+	margin-top: 20px;
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+.label-margin{
+	margin-top: 10px;
+	width: 100%;
+}
+
+.sign-up-input{
+	font-size: 15px;
+}
+
+#label-error{
+	margin-bottom: 10px;
+}
+
