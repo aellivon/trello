@@ -7,8 +7,8 @@
 			<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12 col-xs-10 offset-xs-2">
 					<form method="post" novalidate>
 						{% csrf_token %}
-						<h2 class="log_in_title"> LOG IN TO TRELLO </h2>
-						<p class="sign_up_sub"> or <a href="{% url 'users:sign_up' %}">create an account</a></p>
+						<h2 class="log-in-title"> LOG IN TO TRELLO </h2>
+						<p class="sign-up-sub"> or <a href="{% url 'users:sign_up' %}">create an account</a></p>
 								{% if form.errors %}
 								{% for error in form.non_field_errors %}
 									<div class="alert alert-danger error_box">
@@ -18,7 +18,7 @@
 								{% endif %}
 
 							
-						<label for="" class="LabelMargin">Username</label>
+						<label for="" class="label-margin">Username</label>
 							{{ form.username }}
 
 								{% if form.username.errors %}
@@ -28,7 +28,7 @@
 									</div>
 								{% endfor %}
 								{% endif %}
-							<label for="" class="LabelMargin">Password</label>
+							<label for="" class="label-margin">Password</label>
 							{{ form.password }}
 
 								{% if form.password.errors %}
@@ -38,7 +38,7 @@
 									</div>
 								{% endfor %}
 								{% endif %}
-						<button  id="sign_up_submit" type="submit" class="btn btn-success ButtonMargin">Log In</button>
+						<button  id="sign-up-submit" type="submit" class="btn btn-success button-margin">Log In</button>
 					</form>
 			</div>
 		</div>

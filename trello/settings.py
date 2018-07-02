@@ -123,6 +123,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'training.swift.aksun@gmail.com'
 EMAIL_HOST_PASSWORD = '@swift12345'
 EMAIL_PORT = 587
+EMAIL = 'training.swift.aksun@gmail.com'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
