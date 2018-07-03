@@ -11,3 +11,14 @@ class BoardModalForm(forms.Form):
 		user = args[0]
 		new_board = Board(name=board_name,owner=user)
 		new_board.save()
+
+	def update(self, *args, **kwargs):
+		data = self.cleaned_data
+		board_name = data["board_name"]
+		update_board = args[0]
+		update_board.name = board_name
+		update_board.save()
+		return update_board
+
+
+

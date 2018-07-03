@@ -44,10 +44,24 @@ class IndexView(LoginRequiredMixin,TemplateView):
 class BoardView(LoginRequiredMixin,TemplateView):
     login_url = reverse_lazy('users:log_in')
     template_name = "boards/boards.html"
-    form = BoardModalForm
+    update_form = BoardModalForm
 
     def get(self, *args,** kwargs):
-        return render(self.request, self.template_name, {})
-    
+        update_form = self.update_form()
+        board_id = self.kwargs.get('id')
+        data = get_object_or_404(Board,pk=board_id)
+        return render(self.request, self.template_name, {'update_form':update_form,'data':data})
+
     def post(self, *args,** kwargs):
-        return HttpResponseRedirect(reverse('users:log_in'))
+        if 'EditModal' in self.request.POST:
+            update_form = self.update_form(self.request.POST)
+            board_id = self.kwargs.get('id')
+            board = get_object_or_404(Board,pk=board_id)
+            if board.owner == self.request.user:
+                if update_form.is_valid():
+                    board = update_form.update(board)
+                    update_form = self.update_form()
+                    return render(self.request, self.template_name, {'update_form':update_form,'data':board})
+            return render(self.request, self.template_name, {'update_form':update_form,'data':board})
+        else:
+            return HttpResponseRedirect(reverse('users:log_in'))
