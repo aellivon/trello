@@ -40,6 +40,44 @@
 	    </div>
 	  </div>
 	</div>
+	<!-- Archiving Modal -->
+	<div class="modal fade" id="ArchiveBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Archive Board</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+
+	   	   {% if update_form.errors %}
+								{% for error in update_form.non_field_errors %}
+									<div class="alert alert-danger error-box-boards">
+									    <strong>{{ error }}</strong>
+									</div>
+									    {% endfor %}
+								{% endif %}
+								{% if update_form.board_name.errors %}
+								{% for error in update_form.board_name.errors %}
+									<div class="alert alert-danger error-box-boards">
+									    <strong>{{ error }}</strong>
+									</div>
+								{% endfor %}
+								{% endif %}
+	      <form name="ArchiveBoardModal" method="post" novalidate="">
+	      	{% csrf_token %}
+		      <div class="modal-body">
+		      		Are you sure you want to archive this board?
+		    </div>
+		      <div class="modal-footer">
+		        <button name="ArchiveBoardModal" type="submit" class="btn btn-primary">Yes</button>
+		      	 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+		      </div>
+	  	</form>
+	    </div>
+	  </div>
+	</div>
 	<div class="row">
 		<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
 			<p class="custom-boards-title"> {{ data.name }} </p>
@@ -51,7 +89,7 @@
 
 			  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
 			    <a class="dropdown-item" data-toggle="modal" data-target="#EditBoardModal">Update Board</a>
-			    <a class="dropdown-item" href="#">Archive Board</a>
+			    <a class="dropdown-item" data-toggle="modal" data-target="#ArchiveBoardModal">Archive Board</a>
 			  </div>
 		</div>
 

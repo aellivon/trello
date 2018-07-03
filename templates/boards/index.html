@@ -58,7 +58,7 @@
 		</div>
 		{% for board in boards %}
 
-			<a href="{% url 'boards:board' id=board.id %}" class="box-board col-lg-2 col-md-3  btn-success btn box-board-has-content">
+			<a href="{% url 'boards:board' id=board.board.id %}" class="box-board col-lg-2 col-md-3  btn-success btn box-board-has-content">
 				<p class="board-text">{{ board.board.name }}</p>
 			</a>
 		{% endfor %}

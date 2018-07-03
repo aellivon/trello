@@ -49,7 +49,7 @@ class BoardView(LoginRequiredMixin,TemplateView):
     def get(self, *args,** kwargs):
         update_form = self.update_form()
         board_id = self.kwargs.get('id')
-        data = get_object_or_404(Board,pk=board_id)
+        data = get_object_or_404(Board,id=board_id)
         return render(self.request, self.template_name, {'update_form':update_form,'data':data})
 
     def post(self, *args,** kwargs):
@@ -62,6 +62,15 @@ class BoardView(LoginRequiredMixin,TemplateView):
                     board = update_form.update(board)
                     update_form = self.update_form()
                     return render(self.request, self.template_name, {'update_form':update_form,'data':board})
+            # Failing validation will give this template
             return render(self.request, self.template_name, {'update_form':update_form,'data':board})
-        else:
+        elif 'ArchiveBoardModal' in self.request.POST:
+            board_id = self.kwargs.get('id')
+            update_form = self.update_form()
+            board = get_object_or_404(Board,pk=board_id)
+            if board.owner == self.request.user:
+                board = update_form.archive(board)
+                return HttpResponseRedirect(reverse('boards:home' , kwargs={'username':
+                    self.request.user.get_username() 
+                }))
             return HttpResponseRedirect(reverse('users:log_in'))

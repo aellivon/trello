@@ -20,5 +20,9 @@ class BoardModalForm(forms.Form):
 		update_board.save()
 		return update_board
 
+	def archive(self, *args, **kwargs):
+		archive_board = args[0]
+		archive_board.archived = True
+		archive_board.save()
 
 
