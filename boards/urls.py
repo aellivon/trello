@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import IndexView,BoardView
+from .views import IndexView, BoardView
 
 
 app_name = 'boards'

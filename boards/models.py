@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import User
 
 class Board(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.TextField(max_length=30)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     archived = models.BooleanField(default=False)
     

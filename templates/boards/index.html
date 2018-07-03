@@ -58,13 +58,8 @@
 				<p class="create-new-board"> Create New Board </p>
 		</div>
 		{% for board in boards %}
-			{% if board.count == 4%}
-				</div>
 
-				<hr class ="BorderForHomePage">
-				<div class ="box-row row ">
-			{% endif %}
-			<a href="{% url 'boards:board' id=board.id %}" class="box-board col-lg-2 col-md-3 btn-success btn box-board-has-content">
+			<a href="{% url 'boards:board' id=board.id %}" class="box-board col-lg-2 col-md-3  btn-success btn box-board-has-content">
 				<p class="board-text">{{ board.board.name }}</p>
 			</a>
 		{% endfor %}

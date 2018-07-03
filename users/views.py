@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from django.utils.http import urlsafe_base64_decode
 from .forms import SignUpForm, UserLogInForm
-from .models import Profile
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 
@@ -21,8 +20,9 @@ class SignUpView(TemplateView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('boards:home', kwargs={'username':\
-                self.request.user.get_username()}))
+            return HttpResponseRedirect(reverse('boards:home', kwargs={ \
+                'username': self.request.user.get_username() \
+                }))
         else:
             form = self.form()
             context = {'form': form}
@@ -34,9 +34,7 @@ class SignUpView(TemplateView):
         else:
             form = self.form(self.request.POST)
             if form.is_valid():
-                # Getting Host Name
-                host = self.request.get_host()
-                user = form.save(host)
+                user = form.save()
                 return HttpResponseRedirect(reverse('users:log_in'))
             else:
                 args = {'form': form}
@@ -59,16 +57,18 @@ class LogInView(TemplateView):
 
     def post(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('boards:home', kwargs={'username':\
-                self.request.user.get_username()}))
+            return HttpResponseRedirect(reverse('boards:home', kwargs={ \
+                'username': self.request.user.get_username() \
+                }))
         else:
             form = self.form(self.request.POST) 
             if form.is_valid():
                 user = form.login()
                 if user is not None:
                     login(self.request, user)
-                    return HttpResponseRedirect(reverse('boards:home', kwargs={'username':\
-                self.request.user.get_username()}))
+                    return HttpResponseRedirect(reverse('boards:home', kwargs={ \
+                        'username': self.request.user.get_username() \
+                        }))
             context = {'form': form}
 
             return render(self.request, self.template_name, context)

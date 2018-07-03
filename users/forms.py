@@ -10,7 +10,6 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.shortcuts import reverse
 from .models import User
-from .models import Profile
 from django.core.mail import send_mail
 from annoying.functions import get_object_or_None
 
@@ -45,13 +44,6 @@ class SignUpForm(forms.Form):
         new_user.first_name = data["first_name"]
         new_user.last_name = ["last_name"]
         new_user.save()
-
-
-
-        new_profile = Profile(user=new_user)
-        new_profile.initials = new_user.first_name[0] + new_user.last_name[0]
-        new_profile.bio = ''
-        new_profile.save()
         
         return new_user
 
@@ -59,6 +51,7 @@ class SignUpForm(forms.Form):
     def clean_username(self, *args, **kwargs):
         username = self.data.get("username")
         user_with_the_same_username = User.objects.filter(username=username)
+        import pdb; pdb.set_trace()
         if user_with_the_same_username.count()==1:
             raise forms.ValidationError("This user already exists! Please choose another username.")
         
@@ -113,7 +106,7 @@ class UserLogInForm(forms.Form):
 
             if not user.is_active:
                 raise forms.ValidationError("This user is not active!")
-            profile = Profile.objects.get(user=user)
+            # profile = Profile.objects.get(user=user)
            
         return super(UserLogInForm, self).clean(*args, **kwargs)
 

@@ -31,8 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'users.apps.UsersConfig',
-    'boards.apps.BoardsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'annoying',
+    'users',
+    'boards'
 ]
 
 MIDDLEWARE = [
@@ -70,6 +70,9 @@ TEMPLATES = [
     },
 ]
 
+# For abstract user
+AUTH_USER_MODEL = 'users.User'
+
 WSGI_APPLICATION = 'trello.wsgi.application'
 
 
@@ -84,7 +87,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
