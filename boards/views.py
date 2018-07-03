@@ -55,13 +55,11 @@ class BoardView(LoginRequiredMixin,TemplateView):
     def post(self, *args,** kwargs):
         if 'EditModal' in self.request.POST:
             update_form = self.update_form(self.request.POST)
-            username = self.request.user.get_username()
-            user = get_object_or_404(User,username=username)
             board_id = self.kwargs.get('id')
             board = get_object_or_404(Board,pk=board_id)
-            if board.owner == user:
+            if board.owner == self.request.user:
                 if update_form.is_valid():
-                    board = update_form.update(board_id)
+                    board = update_form.update(board)
                     update_form = self.update_form()
                     return render(self.request, self.template_name, {'update_form':update_form,'data':board})
             return render(self.request, self.template_name, {'update_form':update_form,'data':board})

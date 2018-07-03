@@ -15,9 +15,10 @@ class BoardModalForm(forms.Form):
 	def update(self, *args, **kwargs):
 		data = self.cleaned_data
 		board_name = data["board_name"]
-		board_id = args[0]
-		update_board = Board.objects.get(pk=board_id)
+		update_board = args[0]
 		update_board.name = board_name
 		update_board.save()
 		return update_board
+
+
 
