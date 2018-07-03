@@ -78,11 +78,22 @@
 	    </div>
 	  </div>
 	</div>
-	<div class="row">
-		<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+	<div class="row custom-row">
+		<div class="col-lg-9 col-md-7 col-sm-6 col-xs-5 ">
 			<p class="custom-boards-title"> {{ data.name }} </p>
 		</div>
-		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 dropdown show custom-boards-title custom-settings-board text-right">
+		<div class="col-lg-3 col-md-5 col-sm-6 col-xs-7 show custom-boards-title form-inline">
+			<div class="dropdown ml-auto">
+			  <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Members
+			  </a>
+
+			  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+			    <a class="dropdown-item" data-toggle="modal" data-target="#">Invite Member</a>
+			    <a class="dropdown-item" href="#">Manage Member</a>
+			  </div>
+			</div>
+			<div class="dropdown ml-3 text-right">
 			  <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 			    Settings
 			  </a>
@@ -91,6 +102,8 @@
 			    <a class="dropdown-item" data-toggle="modal" data-target="#EditBoardModal">Update Board</a>
 			    <a class="dropdown-item" data-toggle="modal" data-target="#ArchiveBoardModal">Archive Board</a>
 			  </div>
+			</div>
+
 		</div>
 
 	</div>

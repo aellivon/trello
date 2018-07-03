@@ -24,6 +24,7 @@ body {
 	color:black;
 }
 
+
 .box-row{
 	text-align:center;
 	margin-bottom: 10px;
@@ -34,6 +35,11 @@ hr.border{
 	margin-top:0px;
 	width: 100%;
 }
+
+.inline-block{
+	display: inline-block;
+}
+
 
 .box-board{
 
@@ -46,8 +52,12 @@ hr.border{
 
 }
 
-.right-element-settings{
+.custom-row{
+	width: 100%;
 	position: fixed;
+}
+
+.right-element-settings{
 }
 
 .box-board-has-content{
@@ -55,6 +65,9 @@ hr.border{
 
 }
 
+.fixed-position{
+	position:fixed;
+}
 
 .custom-boards-title{
 	margin-top: 20px;

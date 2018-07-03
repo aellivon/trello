@@ -13,6 +13,7 @@ from .mixins import ThrowHomeIfNotLoggedInMixIn
 
 
 class SignUpView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
+    # This mix in throws home if not logged in
     """
         Views for the Sign Up Page
     """
@@ -35,7 +36,7 @@ class SignUpView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
 
 
 class LogInView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
-
+    # This mix in throws home if not logged in
     template_name = "users/log_in.html"
     form = UserLogInForm
 
