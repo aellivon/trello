@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block body %}
+	{% include 'nav_bar.html' %}
+
+	</nav>
+	<div class="modal fade" id="createBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Create New Board</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+
+	   	   {% if form.errors %}
+								{% for error in form.non_field_errors %}
+									<div class="alert alert-danger error_box">
+									    <strong>{{ error }}</strong>
+									</div>
+									    {% endfor %}
+								{% endif %}
+								{% if form.board_name.errors %}
+								{% for error in form.board_name.errors %}
+									<div class="alert alert-danger error_box">
+									    <strong>{{ error }}</strong>
+									</div>
+								{% endfor %}
+								{% endif %}
+	      <form method="post" novalidate="">
+	      	{% csrf_token %}
+		      <div class="modal-body">
+		        {{ form.board_name }}	      
+		    </div>
+		      <div class="modal-footer">
+		        <button type="submit" class="btn btn-primary">Create Board</button>
+		      </div>
+	  	</form>
+	    </div>
+	  </div>
+	</div>
+	<div class="row">
+		<div class="col-lg-4 offset-lg-4 col-md-8 offset-md-2 col-sm-12 col-xs-10 offset-xs-2">
+		<center>
+			<h2 class="custom-index-title"> Personal Boards </h2>
+		</center>
+		<hr class ="border">
+
+
+	</div>
+
+	</div>
+	<div class ="box-row row">
+		<div class="box-board col-lg-2 col-md-3 btn-info btn" data-toggle="modal" data-target="#createBoardModal">
+				<p class="create-new-board"> Create New Board </p>
+		</div>
+		{% for board in boards %}
+			{% if board.count == 4%}
+				</div>
+
+				<hr class ="BorderForHomePage">
+				<div class ="box-row row ">
+			{% endif %}
+			<div class="box-board col-lg-2 col-md-3 btn-success btn box-board-has-content">
+				<p class="board-text">{{ board.board.name }}</p>
+			</div>
+		{% endfor %}
+
+		
+	</div>
+		
+{% endblock %}

@@ -1,3 +1,20 @@
 from django.db import models
+from users.models import User
 
-# Create your models here.
+class Board(models.Model):
+    name = models.TextField(max_length=30)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    archived = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return "{}/{}".format(self.name , self.owner) 
+
+
+class BoardMember(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board,on_delete=models.CASCADE)
+    is_confirmed = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return "{} in {}".format(self.user, self.board)

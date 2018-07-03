@@ -10,7 +10,6 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.shortcuts import reverse
 from .models import User
-from .models import Profile
 from django.core.mail import send_mail
 from annoying.functions import get_object_or_None
 
@@ -18,20 +17,20 @@ class SignUpForm(forms.Form):
     """
     The form for the sign up page
     """
-    first_name = forms.CharField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    last_name = forms.CharField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    username = forms.CharField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    email = forms.EmailField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    password = forms.CharField(\
-        required=True,widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
+    first_name = forms.CharField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    last_name = forms.CharField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    username = forms.CharField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    email = forms.EmailField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    password = forms.CharField(
+        required=True, widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
         )
 
     confirm_password = forms.CharField(
-        required=True,widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
+        required=True, widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
         )
 
 
@@ -45,20 +44,13 @@ class SignUpForm(forms.Form):
         new_user.first_name = data["first_name"]
         new_user.last_name = ["last_name"]
         new_user.save()
-
-
-
-        new_profile = Profile(user=new_user)
-        new_profile.initials = new_user.first_name[0] + new_user.last_name[0]
-        new_profile.bio = ''
-        new_profile.save()
         
         return new_user
 
 
     def clean_username(self, *args, **kwargs):
         username = self.data.get("username")
-        user_with_the_same_username = User.objects.filter(username=username)
+        user_with_the_same_username = User.objects.filter(username=username)        
         if user_with_the_same_username.count()==1:
             raise forms.ValidationError("This user already exists! Please choose another username.")
         
@@ -81,10 +73,10 @@ class SignUpForm(forms.Form):
 
     
 class UserLogInForm(forms.Form):
-    username = forms.CharField(required=True,max_length=20\
+    username = forms.CharField(required=True,max_length=20
         ,widget=forms.TextInput(attrs={'class' : 'form-control input-center'}))
 
-    password = forms.CharField(required=True,\
+    password = forms.CharField(required=True,
         widget=forms.PasswordInput(attrs={'class' : 'form-control input-center'}))
 
 
@@ -113,7 +105,7 @@ class UserLogInForm(forms.Form):
 
             if not user.is_active:
                 raise forms.ValidationError("This user is not active!")
-            profile = Profile.objects.get(user=user)
+            # profile = Profile.objects.get(user=user)
            
         return super(UserLogInForm, self).clean(*args, **kwargs)
 
