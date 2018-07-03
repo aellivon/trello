@@ -9,9 +9,10 @@ from django.utils.http import urlsafe_base64_decode
 from .forms import SignUpForm, UserLogInForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from .mixins import ThrowHomeIfNotLoggedInMixIn
 
 
-class SignUpView(TemplateView):
+class SignUpView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
     """
         Views for the Sign Up Page
     """
@@ -19,26 +20,18 @@ class SignUpView(TemplateView):
     form = SignUpForm
 
     def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('boards:home', kwargs={ \
-                'username': self.request.user.get_username() \
-                }))
-        else:
-            form = self.form()
-            context = {'form': form}
-            return render(self.request, self.template_name,context)
+        form = self.form()
+        context = {'form': form}
+        return render(self.request, self.template_name,context)
 
     def post(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse(''))
+        form = self.form(self.request.POST)
+        if form.is_valid():
+            user = form.save()
+            return HttpResponseRedirect(reverse('users:log_in'))
         else:
-            form = self.form(self.request.POST)
-            if form.is_valid():
-                user = form.save()
-                return HttpResponseRedirect(reverse('users:log_in'))
-            else:
-                args = {'form': form}
-                return render(self.request, self.template_name, args)
+            args = {'form': form}
+            return render(self.request, self.template_name, args)
 
 
 class LogInView(TemplateView):
@@ -48,30 +41,25 @@ class LogInView(TemplateView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('boards:home' , kwargs={'username':\
-                self.request.user.get_username()}))
+            return HttpResponseRedirect(reverse('boards:home' , kwargs={'username':
+                    self.request.user.get_username()
+                }))
         else:
             form = self.form()
             context = {'form': form}
             return render(self.request, self.template_name,context)
 
     def post(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('boards:home', kwargs={ \
-                'username': self.request.user.get_username() \
-                }))
-        else:
-            form = self.form(self.request.POST) 
-            if form.is_valid():
-                user = form.login()
-                if user is not None:
-                    login(self.request, user)
-                    return HttpResponseRedirect(reverse('boards:home', kwargs={ \
-                        'username': self.request.user.get_username() \
-                        }))
-            context = {'form': form}
-
-            return render(self.request, self.template_name, context)
+        form = self.form(self.request.POST) 
+        if form.is_valid():
+            user = form.login()
+            if user is not None:
+                login(self.request, user)
+                return HttpResponseRedirect(reverse('boards:home', kwargs={ 
+                        'username': self.request.user.get_username() 
+                    }))
+        context = {'form': form}
+        return render(self.request, self.template_name, context)
 
 class LogOutView(TemplateView):
     template_name = "users/log_in.html"

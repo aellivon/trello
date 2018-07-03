@@ -17,20 +17,20 @@ class SignUpForm(forms.Form):
     """
     The form for the sign up page
     """
-    first_name = forms.CharField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    last_name = forms.CharField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    username = forms.CharField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    email = forms.EmailField(max_length=20,\
-        required=True,widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    password = forms.CharField(\
-        required=True,widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
+    first_name = forms.CharField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    last_name = forms.CharField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    username = forms.CharField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    email = forms.EmailField(max_length=20,
+        required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
+    password = forms.CharField(
+        required=True, widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
         )
 
     confirm_password = forms.CharField(
-        required=True,widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
+        required=True, widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
         )
 
 
@@ -50,8 +50,7 @@ class SignUpForm(forms.Form):
 
     def clean_username(self, *args, **kwargs):
         username = self.data.get("username")
-        user_with_the_same_username = User.objects.filter(username=username)
-        import pdb; pdb.set_trace()
+        user_with_the_same_username = User.objects.filter(username=username)        
         if user_with_the_same_username.count()==1:
             raise forms.ValidationError("This user already exists! Please choose another username.")
         
@@ -74,10 +73,10 @@ class SignUpForm(forms.Form):
 
     
 class UserLogInForm(forms.Form):
-    username = forms.CharField(required=True,max_length=20\
+    username = forms.CharField(required=True,max_length=20
         ,widget=forms.TextInput(attrs={'class' : 'form-control input-center'}))
 
-    password = forms.CharField(required=True,\
+    password = forms.CharField(required=True,
         widget=forms.PasswordInput(attrs={'class' : 'form-control input-center'}))
 
 
