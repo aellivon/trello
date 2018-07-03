@@ -4,7 +4,6 @@ from django.dispatch import receiver
 
 @receiver(post_save, sender=Board)
 def add_board_member(sender, instance, **kwargs):
-	import pdb; pdb.set_trace()
 	new_board_member = BoardMember(user=instance.owner,board=instance)
 	new_board_member.is_confirmed = True
 	new_board_member.save()
