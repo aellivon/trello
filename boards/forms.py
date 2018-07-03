@@ -5,20 +5,17 @@ class BoardModalForm(forms.Form):
 	board_name = forms.CharField(max_length=30,
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
 
-	def save(self, *args, **kwargs):
-		data = self.cleaned_data
-		board_name = data["board_name"]
-		user = args[0]
-		new_board = Board(name=board_name,owner=user)
+	def save(self, user):
+		new_board = Board(name=self.cleaned_data('board_name'), owner=user)
 		new_board.save()
 
-	def update(self, *args, **kwargs):
-		data = self.cleaned_data
-		board_name = data["board_name"]
-		update_board = args[0]
-		update_board.name = board_name
-		update_board.save()
-		return update_board
+	def update(self, board):
+		board.name = self.cleaned_data('board_name')
+		board.save()
+		return board
 
+	def archive(self, board):
+		board.archived = True
+		board.save()
 
 
