@@ -41,8 +41,6 @@ class IndexView(LoginRequiredMixin,TemplateView):
         return render(self.request, self.template_name, {'form':form, 'boards': boards})
 
 
-    
-
 class BoardView(LoginRequiredMixin,TemplateView):
     login_url = reverse_lazy('users:log_in')
     template_name = "boards/boards.html"

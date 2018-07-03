@@ -11,8 +11,3 @@ class BoardModalForm(forms.Form):
 		user = args[0]
 		new_board = Board(name=board_name,owner=user)
 		new_board.save()
-
-		new_board_member = BoardMember(user=user,board=new_board)
-		new_board_member.is_confirmed = True
-		new_board_member.save()
-
