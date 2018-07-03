@@ -34,20 +34,15 @@ class SignUpView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
             return render(self.request, self.template_name, args)
 
 
-class LogInView(TemplateView):
+class LogInView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
 
     template_name = "users/log_in.html"
     form = UserLogInForm
 
     def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('boards:home' , kwargs={'username':
-                    self.request.user.get_username()
-                }))
-        else:
-            form = self.form()
-            context = {'form': form}
-            return render(self.request, self.template_name,context)
+        form = self.form()
+        context = {'form': form}
+        return render(self.request, self.template_name,context)
 
     def post(self, *args, **kwargs):
         form = self.form(self.request.POST) 
