@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block body %}
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12 col-xs-10 offset-xs-2">
+
+				{% if success == True and account == True %}
+				<div class = "user-validation-margin-top">
+
+					<div class="alert alert-success user_validation_box">
+						<center>
+						<strong>Validation is successful! </strong>
+						</center>
+					</div>
+					<form method="post" novalidate>
+						{% csrf_token %}
+						<center>
+							 <button name="JoinBoard" id="JoinBoard" type="submit" class="btn btn-success ButtonMargin">Join the '{{ board.name }}' board now!</button>
+						</center>
+					</form>
+				</div>
+				{% elif success == True and account == False %}
+					<form method="post" novalidate>
+						{% csrf_token %}
+						<h2 class="sign-up-title"> Create your trello account to go to the board </h2>
+								{% if form.errors %}
+								{% for error in form.non_field_errors %}
+									<div class="alert alert-danger error-box">
+									    <strong>{{ error }}</strong>
+									</div>
+									    {% endfor %}
+								{% endif %}
+
+						<label for="email" class="label-margin">Email</label>
+								<strong>{{ email }}</strong>
+								
+							
+						<label for="" class="label-margin">Username</label>
+							{{ form.username }}
+
+								{% if form.username.errors %}
+								{% for error in form.username.errors %}
+									<div class="alert alert-danger error-box">
+									    <strong>{{ error }}</strong>
+									</div>
+								{% endfor %}
+								{% endif %}
+
+						<label for="password" class="label-margin">Password</label>
+							{{ form.password }}
+							{% if form.password.errors %}
+								{% for error in form.password.errors %}
+									<div class="alert alert-danger error-box">
+									    <strong>{{ error }}</strong>
+									</div>
+								{% endfor %}
+								{% endif %}
+						<label for="confirm_password" class="label-margin">Confirm Password</label>
+						{{ form.confirm_password }}
+							{% if form.confirm_password.errors %}
+								{% for error in form.confirm_password.errors %}
+									<div class="alert alert-danger error-box">
+									    <strong>{{ error }}</strong>
+									</div>
+								{% endfor %}
+								{% endif %}
+						<button  name="ReferralSignUp" type="submit" class="btn btn-success button-margin">Create New Account</button>
+					</form>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock %}

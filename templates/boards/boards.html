@@ -3,8 +3,10 @@
 
 {% block body %}
 	{% include 'nav_bar.html' %}
+	<!-- Design for modals -->
+	<!-- Update Board Modal  -->
 
-	<div class="modal fade" id="EditBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade modal-fixed" id="EditBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -13,16 +15,8 @@
 	          <span aria-hidden="true">&times;</span>
 	        </button>
 	      </div>
-
-	   	   {% if update_form.errors %}
-								{% for error in update_form.non_field_errors %}
-									<div class="alert alert-danger error-box-boards">
-									    <strong>{{ error }}</strong>
-									</div>
-									    {% endfor %}
-								{% endif %}
-								{% if update_form.board_name.errors %}
-								{% for error in update_form.board_name.errors %}
+								{% if board_form.board_name.errors %}
+								{% for error in board_form.board_name.errors %}
 									<div class="alert alert-danger error-box-boards">
 									    <strong>{{ error }}</strong>
 									</div>
@@ -31,7 +25,7 @@
 	      <form name="EditModal" method="post" novalidate="">
 	      	{% csrf_token %}
 		      <div class="modal-body">
-		        {{ update_form.board_name }}	      
+		        {{ board_form.board_name }}	      
 		    </div>
 		      <div class="modal-footer">
 		        <button name="EditModal" type="submit" class="btn btn-primary">Update Board</button>
@@ -41,30 +35,12 @@
 	  </div>
 	</div>
 	<!-- Archiving Modal -->
-	<div class="modal fade" id="ArchiveBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade modal-fixed" id="ArchiveBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <h5 class="modal-title" id="exampleModalLabel">Archive Board</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
 	      </div>
-
-	   	   {% if update_form.errors %}
-								{% for error in update_form.non_field_errors %}
-									<div class="alert alert-danger error-box-boards">
-									    <strong>{{ error }}</strong>
-									</div>
-									    {% endfor %}
-								{% endif %}
-								{% if update_form.board_name.errors %}
-								{% for error in update_form.board_name.errors %}
-									<div class="alert alert-danger error-box-boards">
-									    <strong>{{ error }}</strong>
-									</div>
-								{% endfor %}
-								{% endif %}
 	      <form name="ArchiveBoardModal" method="post" novalidate="">
 	      	{% csrf_token %}
 		      <div class="modal-body">
@@ -78,19 +54,99 @@
 	    </div>
 	  </div>
 	</div>
-	<div class="row">
-		<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
-			<p class="custom-boards-title"> {{ data.name }} </p>
+	<!-- Invite Member Modal -->
+	<div class="modal fade modal-fixed" id="AddMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Invite Member</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+								
+	      <form name="AddMemberModal" method="post" novalidate="">
+	      	{% csrf_token %}
+
+		      <div class="modal-body">
+		      		<label for="" class="label-margin">Email</label>
+		      		{{ member_form.email }}
+		      		{% if member_form.email.errors %}
+								{% for error in member_form.email.errors %}
+									<div class="alert alert-danger error-box-member-invite">
+									    <strong>{{ error }}</strong>
+									</div>
+								{% endfor %}
+						{% endif %}
+	   		    </div>
+
+		      <div class="modal-footer">
+		        <button name="AddMemberModal" type="submit" class="btn btn-primary">Invite</button>
+		      </div>
+	  	</form>
+	    </div>
+	  </div>
+	</div>
+	<!-- Message Box Modal Alert -->
+	{% if message_box %}
+		<div class="modal fade modal-fixed" id="MessageBoxModalAlert" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">{{ message_box.title }}</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+									
+		      <div name="MessageBoxModalAlert" novalidate="">
+		      	{% csrf_token %}
+
+			      <div class="modal-body">
+							<div class="alert alert-success">
+								<strong>{{ message_box.message }}</strong>
+							</div>
+									
+		   		    </div>
+
+			      <div class="modal-footer">
+			        <button name="MessageBoxModalAlert" class="btn btn-primary" data-dismiss="modal">{{ message_box.button }}</button>
+			      </div>
+		  	</div>
+		    </div>
+		  </div>
 		</div>
-		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 dropdown show custom-boards-title custom-settings-board text-right">
+
+	{% endif %}
+	<!-- Design for page elements -->
+	<div class="row custom-row">
+		<div class="col-lg-9 col-md-7 col-sm-6 col-xs-5 ">
+			<p class="custom-boards-title"> {{ board.name }} </p>
+		</div>
+		<div class="col-lg-3 col-md-5 col-sm-6 col-xs-7 show custom-boards-title form-inline">
+			{% if owner %}
+				<div class="dropdown ml-auto">
+
 			  <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			    Settings
+			    Members
 			  </a>
 
 			  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-			    <a class="dropdown-item" data-toggle="modal" data-target="#EditBoardModal">Update Board</a>
-			    <a class="dropdown-item" data-toggle="modal" data-target="#ArchiveBoardModal">Archive Board</a>
+			    <a class="dropdown-item" data-toggle="modal" data-target="#AddMemberModal">Invite Member</a>
+			    <a class="dropdown-item" href="#">Remove Member</a>
 			  </div>
+			</div>
+				<div class="dropdown ml-3 text-right">
+				  <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    Settings
+				  </a>
+
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+				    <a class="dropdown-item" data-toggle="modal" data-target="#EditBoardModal">Update Board</a>
+				    <a class="dropdown-item" data-toggle="modal" data-target="#ArchiveBoardModal">Archive Board</a>
+				  </div>
+				</div>
+			{% endif %}
 		</div>
 
 	</div>

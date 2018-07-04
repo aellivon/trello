@@ -14,6 +14,33 @@ body {
   
 }
 
+.user-validation-margin-top{
+	margin-top: 150px;
+	padding: 20px;
+	padding-top: 30px;
+	height: 60%;
+	width: 100%;
+	text-align: center;
+	background-color: #cccc
+}
+
+
+.custom-margin-left{
+	margin-left: 60%;
+}
+
+.text-align-center{
+	text-align:center;
+}
+
+.center-message-box{
+	 margin:auto;
+}
+
+.modal-fixed{
+	position: fixed;
+}
+
 
 .board-text{
 	margin-top:100px;
@@ -24,6 +51,7 @@ body {
 	color:black;
 }
 
+
 .box-row{
 	text-align:center;
 	margin-bottom: 10px;
@@ -33,6 +61,14 @@ hr.border{
 	border-top: 2px solid #888888;
 	margin-top:0px;
 	width: 100%;
+}
+
+.inline-block{
+	display: inline-block;
+}
+
+.error-box-member-invite{
+	margin-top: 10px;
 }
 
 .box-board{
@@ -46,8 +82,12 @@ hr.border{
 
 }
 
-.right-element-settings{
+.custom-row{
+	width: 100%;
 	position: fixed;
+}
+
+.right-element-settings{
 }
 
 .box-board-has-content{
@@ -55,6 +95,9 @@ hr.border{
 
 }
 
+.fixed-position{
+	position:fixed;
+}
 
 .custom-boards-title{
 	margin-top: 20px;
