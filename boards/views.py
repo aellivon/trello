@@ -168,22 +168,20 @@ class UserValidationView(TemplateView):
         board = referral.board_member.board
         email = referral.email
         form = self.form()
-
+        
         if referral:
             # Checking if the user exists
             user = get_object_or_None(User, email=referral.email)
             if user:
                 user = form.login(self.request, user=user)
                 return render(self.request, self.template_name,
-                    {'form':form, 'email' : email, 'board': board , 'success': True , 'account' : True}
+                    {'form':form, 'email' : email, 'board': board , 'account' : True}
                 )
             else:
                 return render(self.request, self.template_name,
-                    {'form':form, 'email' : email, 'board': board , 'success': True , 'account' : False}
+                    {'form':form, 'email' : email, 'board': board, 'account' : False}
                 ) 
-        return render(self.request, self.template_name,
-            {'form':form, 'email' : email, 'board': board , 'success' : False, 'account' : False}
-        )
+        return HttpResponseBadRequest()
 
     def post(self, *args, **kwargs):
         form = self.form(self.request.POST)

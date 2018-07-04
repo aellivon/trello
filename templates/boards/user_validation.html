@@ -6,7 +6,7 @@
 		<div class="row">
 			<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-12 col-xs-10 offset-xs-2">
 
-				{% if success == True and account == True %}
+				{% if account == True %}
 				<div class = "user-validation-margin-top">
 
 					<div class="alert alert-success user_validation_box">
@@ -21,7 +21,7 @@
 						</center>
 					</form>
 				</div>
-				{% elif success == True and account == False %}
+				{% elif account == False %}
 					<form method="post" novalidate>
 						{% csrf_token %}
 						<h2 class="sign-up-title"> Create your trello account to go to the board </h2>
