@@ -163,7 +163,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
             stacked_id_to_remove = self.request.POST.getlist('remove_member')
             member_form = self.member_form()
             board_form = self.board_form()
-            member_form.remove_member(stacked_id_to_remove, board_id)
+            member_form.remove_member(stacked_id_to_remove)
             return render(self.request, self.template_name,
                 {
                    'board_form': board_form, 'member_form': member_form,
@@ -174,7 +174,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
 
         return HttpResponseBadRequest()
 
-class UserValidationView(ThrowHomeIfLoggedInMixIn,TemplateView):
+class UserValidationView(TemplateView):
     """
         Views for the User Validation Page
     """
@@ -211,6 +211,7 @@ class UserValidationView(ThrowHomeIfLoggedInMixIn,TemplateView):
         email = referral.email
         if 'JoinBoard' in self.request.POST:
             # User Is Already Registered
+
             board_id = form.join_board(user, token)
             return HttpResponseRedirect(reverse('boards:board' , kwargs={'id':board_id  }))
         elif 'ReferralSignUp' in self.request.POST:

@@ -69,9 +69,10 @@ class MembersModalForm(forms.Form):
         new_referral.user = user
         new_referral.save()
 
-    def remove_member(self, to_remove, board_id):
+    def remove_member(self, to_remove):
+        # removing members from a board
         for id in to_remove:
-            BoardMember.objects.filter(user__id=id,board__id=board_id).delete()
+            BoardMember.objects.filter(pk=id).delete()
 
 
     def clean_email(self):

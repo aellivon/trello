@@ -2,7 +2,7 @@
 $(document).ready(function() {
 	// Closing and Opening another modal for confirmation
 	$(document).on("click", '#btnRemove', function(event){
-		// Remove Event
+		// Sequence of prompting and error of removing members
 		var atLeastOneIsChecked = $('input[name="remove_member"]:checked').length > 0;
 		if (atLeastOneIsChecked==true) {
 			$("#reactor").empty();
