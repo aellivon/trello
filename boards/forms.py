@@ -71,7 +71,6 @@ class MembersModalForm(forms.Form):
 
     def remove_member(self, to_remove, board_id):
         for id in to_remove:
-            print (BoardMember.objects.filter(user__id=id,board__id=board_id))
             BoardMember.objects.filter(user__id=id,board__id=board_id).delete()
 
 
