@@ -6,11 +6,8 @@ from django.contrib.auth import (
     logout,
 )
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
 from django.shortcuts import reverse
 from .models import User
-from django.core.mail import send_mail
 from annoying.functions import get_object_or_None
 
 class SignUpForm(forms.Form):
@@ -23,7 +20,7 @@ class SignUpForm(forms.Form):
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
     username = forms.CharField(max_length=20,
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
-    email = forms.EmailField(max_length=20,
+    email = forms.EmailField(
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
     password = forms.CharField(
         required=True, widget=forms.PasswordInput(attrs={'class' : 'form-control sign-up-input'})
@@ -108,6 +105,3 @@ class UserLogInForm(forms.Form):
             # profile = Profile.objects.get(user=user)
            
         return super(UserLogInForm, self).clean(*args, **kwargs)
-
-
-

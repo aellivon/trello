@@ -14,6 +14,33 @@ body {
   
 }
 
+.user-validation-margin-top{
+	margin-top: 150px;
+	padding: 20px;
+	padding-top: 30px;
+	height: 60%;
+	width: 100%;
+	text-align: center;
+	background-color: #cccc
+}
+
+
+.custom-margin-left{
+	margin-left: 60%;
+}
+
+.text-align-center{
+	text-align:center;
+}
+
+.center-message-box{
+	 margin:auto;
+}
+
+.modal-fixed{
+	position: fixed;
+}
+
 
 .board-text{
 	margin-top:100px;
@@ -40,6 +67,9 @@ hr.border{
 	display: inline-block;
 }
 
+.error-box-member-invite{
+	margin-top: 10px;
+}
 
 .box-board{
 

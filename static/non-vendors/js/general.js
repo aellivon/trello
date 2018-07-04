@@ -11,4 +11,14 @@ $(document).ready(function() {
 		 $('#EditBoardModal').modal('show');
 	}
 
+	if ($('div.error-box-member-invite').length) {
+		 $('#AddMemberModal').modal('show');
+	}
+
+	if ($('#MessageBoxModalAlert').length) {
+		 $('#MessageBoxModalAlert').modal('show');
+	}
+
+	
+
 });

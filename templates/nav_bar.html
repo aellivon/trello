@@ -11,7 +11,7 @@
 			        </ul>
 			    </div>
 			    <div class="mx-auto order-0">
-			        <a class="custom-navbar-element navbar-brand mx-auto" href="#">Trello</a>
+			        <a class="custom-navbar-element navbar-brand mx-auto"  href="{% url 'boards:home' username=current_user %}">Trello</a>
 			        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
 			            <span class="navbar-toggler-icon"></span>
 			        </button>
@@ -21,7 +21,7 @@
 			        <ul class="navbar-nav ml-auto">
 			        				  
 				      <li class="nav-item">
-        					<a class="nav-link custom-navbar-element" href="#">Boards</a>
+        					<a class="nav-link custom-navbar-element" href="{% url 'boards:home' username=current_user %}">Boards</a>
       					</li>
 				    	<li class="nav-item dropdown">
 				        <a class="custom_link custom-navbar-element nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

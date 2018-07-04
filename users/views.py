@@ -9,10 +9,10 @@ from django.utils.http import urlsafe_base64_decode
 from .forms import SignUpForm, UserLogInForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from .mixins import ThrowHomeIfNotLoggedInMixIn
+from .mixins import ThrowHomeIfLoggedInMixIn
 
 
-class SignUpView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
+class SignUpView(ThrowHomeIfLoggedInMixIn,TemplateView):
     # This mix in throws home if not logged in
     """
         Views for the Sign Up Page
@@ -35,7 +35,7 @@ class SignUpView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
             return render(self.request, self.template_name, args)
 
 
-class LogInView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
+class LogInView(ThrowHomeIfLoggedInMixIn,TemplateView):
     # This mix in throws home if not logged in
     template_name = "users/log_in.html"
     form = UserLogInForm
@@ -56,6 +56,7 @@ class LogInView(ThrowHomeIfNotLoggedInMixIn,TemplateView):
                     }))
         context = {'form': form}
         return render(self.request, self.template_name, context)
+
 
 class LogOutView(TemplateView):
     template_name = "users/log_in.html"
