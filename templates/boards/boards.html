@@ -87,6 +87,70 @@
 	    </div>
 	  </div>
 	</div>
+	<!-- Remove Member Modal -->
+
+	<form name="RemoveMemberModal" method="post" novalidate="">
+
+	{% csrf_token %}
+      		<!-- Inner Confirmation Modal -->
+		<div class="modal fade modal-fixed" id="RemoveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+
+			      <div class="modal-body">
+			      		Are you sure you want to remove these?
+		   		    </div>
+
+			      <div class="modal-footer">
+			      	<button name="RemoveMemberModal" type="submit" class="btn btn-primary">Yes</button>
+			        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+
+			      </div>
+		  
+		    </div>
+		  </div>
+		</div>
+	<div class="modal fade modal-fixed" id="RemoveMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Remove Member</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+								
+
+		      <div class="modal-body">
+		      		<div id = "reactor">
+					</div>
+		      		{% for member in board_member %}
+		      			
+		      		     	<div class="form-check">
+								<label class="form-check-label">
+								<fieldset id="checkArray">
+								    <input name="remove_member" class="form-check-input" type="checkbox" value="{{member.user.id}}">
+								     {{ member.user.username }}  {% if not member.is_confirmed %} Pending {% endif %}
+
+								</fieldset>
+								</label>
+							</div>
+		      		{% endfor %}
+	   		    </div>
+
+		      <div class="modal-footer">
+		          <span id="btnRemove"> <button type="button" class="btn btn-secondary" >Remove</button></span>
+		      </div>
+	    </div>
+	  </div>
+	</div>
+	</form>
 	<!-- Message Box Modal Alert -->
 	{% if message_box %}
 		<div class="modal fade modal-fixed" id="MessageBoxModalAlert" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -133,7 +197,9 @@
 
 			  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
 			    <a class="dropdown-item" data-toggle="modal" data-target="#AddMemberModal">Invite Member</a>
-			    <a class="dropdown-item" href="#">Remove Member</a>
+			    {% if board_member %}
+			    	<a class="dropdown-item" data-toggle="modal" data-target="#RemoveMemberModal">Remove Member</a>
+			    {% endif %}
 			  </div>
 			</div>
 				<div class="dropdown ml-3 text-right">

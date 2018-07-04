@@ -39,7 +39,7 @@ class SignUpForm(forms.Form):
         password = data["password"]
         new_user = User.objects.create_user(username, email, password)
         new_user.first_name = data["first_name"]
-        new_user.last_name = ["last_name"]
+        new_user.last_name = data["last_name"]
         new_user.save()
         
         return new_user
@@ -102,6 +102,5 @@ class UserLogInForm(forms.Form):
 
             if not user.is_active:
                 raise forms.ValidationError("This user is not active!")
-            # profile = Profile.objects.get(user=user)
            
         return super(UserLogInForm, self).clean(*args, **kwargs)

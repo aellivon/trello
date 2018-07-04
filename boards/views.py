@@ -67,6 +67,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
         board_id = self.kwargs.get('id')
         username = self.request.user.get_username()
         board = get_object_or_404(Board,pk=board_id)
+        board_member = BoardMember.objects.filter(
+            board__id=board_id).exclude(user=board.owner)
         owner = False
         if board.owner == self.request.user:
             owner = True
@@ -74,14 +76,17 @@ class BoardView(LoginRequiredMixin, TemplateView):
             {
                 'board_form': board_form, 'member_form': member_form,
                 'board':board, 'current_user' : username, 'message_box': None,
-                'owner' : owner
+                'owner' : owner, 'board_member' : board_member
             }
         )
+
 
     def post(self, *args,** kwargs):
         board_id = self.kwargs.get('id')
         board = get_object_or_404(Board,pk=board_id)
         owner = False
+        board_member = BoardMember.objects.filter(
+            board__id=board_id).exclude(user=board.owner)
         if board.owner == self.request.user:
             owner = True
         # Edit Board Form
@@ -96,7 +101,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
                         {
                             'board_form': board_form, 'member_form': member_form,
                             'board':board, 'current_user' : self.request.user.get_username(),
-                            'message_box':None, 'owner' : owner
+                            'message_box':None, 'owner' : owner, 'board_member' : board_member
                         }
                     )
             # Failing validation will render this template below
@@ -104,7 +109,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                  'board_form': board_form, 'member_form': member_form,
                  'board':board, 'current_user' : self.request.user.get_username(),
-                 'message_box':None, 'owner' : owner
+                 'message_box':None, 'owner' : owner, 'board_member' : board_member
                 }
             )
         # Archiving Board Form
@@ -121,7 +126,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                     'board_form': board_form, 'member_form': member_form,
                     'board':board, 'current_user' : self.request.user.get_username(),
-                    'message_box': None, 'owner' : owner
+                    'message_box': None, 'owner' : owner, 'board_member' : board_member
                 }
             )
         # Inviting a member form
@@ -142,7 +147,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
                     {
                        'board_form': board_form, 'member_form': member_form,
                        'board':board, 'current_user' : self.request.user.get_username(),
-                        'message_box':message_box, 'owner' : owner
+                        'message_box':message_box, 'owner' : owner, 'board_member' : board_member
                     }
                 )
 
@@ -151,11 +156,25 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                    'board_form': board_form, 'member_form': member_form,
                    'board':board, 'current_user' : self.request.user.get_username(),
-                   'message_box':None, 'owner' : owner
+                   'message_box':None, 'owner' : owner, 'board_member' : board_member
+                }
+            )
+        elif 'RemoveMemberModal' in self.request.POST:
+            stacked_id_to_remove = self.request.POST.getlist('remove_member')
+            member_form = self.member_form()
+            board_form = self.board_form()
+            member_form.remove_member(stacked_id_to_remove, board_id)
+            return render(self.request, self.template_name,
+                {
+                   'board_form': board_form, 'member_form': member_form,
+                   'board':board, 'current_user' : self.request.user.get_username(),
+                   'message_box':None, 'owner' : owner, 'board_member' : board_member
                 }
             )
 
-class UserValidationView(TemplateView):
+        return HttpResponseBadRequest()
+
+class UserValidationView(ThrowHomeIfLoggedInMixIn,TemplateView):
     """
         Views for the User Validation Page
     """
@@ -168,7 +187,7 @@ class UserValidationView(TemplateView):
         board = referral.board_member.board
         email = referral.email
         form = self.form()
-        
+
         if referral:
             # Checking if the user exists
             user = get_object_or_None(User, email=referral.email)
@@ -196,7 +215,7 @@ class UserValidationView(TemplateView):
             return HttpResponseRedirect(reverse('boards:board' , kwargs={'id':board_id  }))
         elif 'ReferralSignUp' in self.request.POST:
             if form.is_valid():
-                user = form.save()
+                user = form.save(email)
                 user = form.login(self.request, user=user)
                 board_id = form.join_board(user,token)
                 return HttpResponseRedirect(reverse('boards:board' , kwargs={'id':board_id  }))
@@ -204,5 +223,5 @@ class UserValidationView(TemplateView):
                 return render(self.request, self.template_name,
                     {'form':form, 'email' : email, 'board': board , 'success': True , 'account' : False}
                 ) 
-
+        return HttpResponseBadRequest()
 

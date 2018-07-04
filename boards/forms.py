@@ -69,6 +69,12 @@ class MembersModalForm(forms.Form):
         new_referral.user = user
         new_referral.save()
 
+    def remove_member(self, to_remove, board_id):
+        for id in to_remove:
+            print (BoardMember.objects.filter(user__id=id,board__id=board_id))
+            BoardMember.objects.filter(user__id=id,board__id=board_id).delete()
+
+
     def clean_email(self):
         # Checking if the email is already a board member or already invited
         email=self.data.get("email")
@@ -98,15 +104,13 @@ class UserValidationForm(forms.Form):
         )
 
 
-    def save(self, *args, **kwargs):
+    def save(self, email):
 
-        data = self.cleaned_data
         username = self.cleaned_data.get('username')
-        email = self.cleaned_data.get("email")
         password = self.cleaned_data.get("password")
         new_user = User.objects.create_user(username, email, password)
-        new_user.first_name = data["username"]
-        new_user.last_name = [""]
+        new_user.first_name = self.cleaned_data.get("username")
+        new_user.last_name = ""
         new_user.save()
         
         return new_user
