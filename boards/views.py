@@ -13,6 +13,7 @@ from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
 from django.core import serializers
+from django.db.models import Max
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -194,11 +195,25 @@ class AddColumnView(View):
         title = self.request.POST.get('title')
         board_id = self.kwargs.get('id')
         board = get_object_or_404(Board,pk=board_id)
-        new_column = Column(board=board,name=title,position=0)
+        max_position=Column.objects.filter(archived=False).aggregate(Max('position'))
+        to_add_position = 1 
+        maximum_exists = max_position.get('position__max')
+        if  maximum_exists:
+            to_add_position =   maximum_exists + 1
+        new_column = Column(board=board,name=title,position=to_add_position)
+
         new_column.save()
-        all_columns = Column.objects.filter(board__id=board_id)
+        all_columns = Column.objects.filter(
+            board__id=board_id,archived=False).order_by('position')
         data=serializers.serialize('json', all_columns)
+        print (data)
         return HttpResponse(data)
+
+class UpdateColumnView(View):
+
+    def post(self, *args, **kwargs):
+        print ("Hi!")
+        
         
 
 

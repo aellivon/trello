@@ -68,6 +68,8 @@ $(document).ready(function() {
              $('#MessageBoxModalAlert').modal('show');
         }
         
+
+        // Animations 
         $(document).on("click", '.add-input-reactor', function(){
             $(".add-input-reactor").hide();
             $("#list-form").show();
@@ -100,6 +102,8 @@ $(document).ready(function() {
             $("#existing-label-"+id).show();
         });
 
+
+
         $(document).on("blur", '.existing-form > input', function(){
             // Losing focus on text input
             if ($(this).val().length) {
@@ -109,7 +113,75 @@ $(document).ready(function() {
                 $("#existing-label-"+id).show();
             }
         });
+        // Reloading the board
+        success_funciton = function(data){
+            popped_url=$('#list-form').data('url');
+            $('.inner-wrap').empty();
+            var a = 0;
+            html = "";
+            while(a < data.length){
+                html += '<div class="floatbox">' 
+                         + '<div id="existing-label-'+data[a].pk+'"' 
+                       + ' class= "existing-reactor" data-value="'+data[a].pk+'"> '
+                       + ' <label data-value="'+data[a].pk+'" '
+                        + 'class="existing-label form-control title-column-class'
+                        + ' non-editable-add-column" placeholder="Add List">'
+                        + ' '+data[a].fields.name+'</label> '
+                        + '      <a href="#"class="list-settings">X</a> '
+                         + ' </div> '
+                         + '   <form  id="existing-form-'+data[a].pk+'" ' 
+                         + '   class="existing-form" action='
+                         + '   "'+popped_url+'" '
+                          + '  data-value="'+data[a].pk+'"> '
+                           + '     <input id="exist-list" class="form-control '
+                           + '      title-column-class" data-value="'+data[a].pk+' '
+                           + '      value='+data[a].fields.name+'>  '
+                           + '     <button name="AddColumn" type="submit" '
+                           + '     class="btn btn-success btn-add-list">Update'
+                           + '     </button> '
+                            + '    <button id="close-add-list" type="button" '
+                           + '      class="btn btn-secondary close-add-list"> '
+                           + '      Cancel</button>  '
+                          + '  </form> </div>';
+               
+                a+=1;
+            }
 
+            html += '<div class="floatbox">'
+                  +'<div class="add-input-reactor">'
+                      +'<label class="form-control title-column-class non-editable-add-column" placeholder="Add List">Add List</label>'
+                  +'</div>'
+                  +'<form id="list-form" action="'+popped_url+'" data-url="'+popped_url+'">'
+                      +'<input id="add-list" class="form-control title-column-class" placeholder="Enter Another List Here"> '
+                      +'<button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Add</button> '
+                      +'<button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>'
+                  +'</form>'
+              +'</div>'
+            $('.inner-wrap').html(html);
+        }
+
+        $('#list-form').on('submit', function(e){
+            e.preventDefault()
+            var title = $('#add-list').val()
+            data = {
+                title : title
+            }
+            var url = $(this).attr('action');
+            $.post(url,data,success_funciton,'json'), function(err){
+
+            };
+        });
+        $('#existing-form').on('submit', function(e){
+            e.preventDefault()
+            var title = $('#exist-list').val();
+            data = {
+                title : title
+            }
+            var url = $(this).attr('action');
+            $.post(url,data,success_funciton,'json'), function(err){
+                
+            };
+        });
 
         
 });

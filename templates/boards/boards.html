@@ -226,12 +226,12 @@
         <div class="inner-wrap">
             {% for column in columns %}
             <div class="floatbox">
-                   <div id="existing-label-{{column.position}}" class="existing-reactor" data-value="{{ column.position }}">
-                      <label data-value="{{ column.position }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
-                      <a href="#"class="list-settings">A</a>
+                   <div id="existing-label-{{column.id}}" class="existing-reactor" data-value="{{ column.id }}">
+                      <label data-value="{{ column.id }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
+                      <a href="#"class="list-settings">X</a>
                   </div>
-                    <form  id="existing-form-{{column.position}}"class="existing-form" action="{% url 'boards:add_column' id=board.id %}" data-value="{{ column.position }}">
-                        <input id="add-list" class="form-control title-column-class" data-value="{{column.position}}" value={{column.name}}> 
+                    <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}">
+                        <input id="exist-list" class="form-control title-column-class" data-value="{{column.id}}" value={{column.name}}> 
                         <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Update</button> 
                         <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  
                     </form>
@@ -242,7 +242,7 @@
                   <div class="add-input-reactor">
                       <label class="form-control title-column-class non-editable-add-column" placeholder="Add List">Add List</label>
                   </div>
-                  <form id="list-form" action="{% url 'boards:add_column' id=board.id %}">
+                  <form id="list-form" action="{% url 'boards:add_column' id=board.id %}" data-url="{% url 'boards:add_column' id=board.id %}">
                       <input id="add-list" class="form-control title-column-class" placeholder="Enter Another List Here"> 
                       <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Add</button> 
                       <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  

@@ -34,7 +34,7 @@ body {
 }
 
 .custom-navbar{
-	position: fixed;
+	position: absolute;
 	width: 100%;
     z-index: 3;
 }
@@ -44,7 +44,7 @@ body {
 	margin-top: 3.5%;
     z-index: 2;
 	width: 100%;
-	position: fixed;
+	position: absolute;
 }
 .user-validation-margin-top{
 	margin-top: 150px;
