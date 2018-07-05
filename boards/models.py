@@ -34,7 +34,7 @@ class Referral(models.Model):
                 not_found = False
 
     def __str__(self):
-        return "{}-referral".format(email)
+        return "{}-referral".format(self.email)
 
 class Column(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
@@ -43,4 +43,4 @@ class Column(models.Model):
     archived = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{}".format(name)
+        return "{}".format(self.name)
