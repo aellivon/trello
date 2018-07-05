@@ -231,7 +231,7 @@
                       <a href="#"class="list-settings">X</a>
                   </div>
                     <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}">
-                        <input id="exist-list" class="form-control title-column-class" data-value="{{column.id}}" value={{column.name}}> 
+                        <input id="exist-list" class="form-control title-column-class exist-list-{{column.id}}" data-value="{{column.id}}" value="{{column.name}}"> 
                         <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Update</button> 
                         <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  
                     </form>

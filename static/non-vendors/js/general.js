@@ -96,7 +96,7 @@ $(document).ready(function() {
             $( "#existing-form-"+id+" > input" ).focus();
         });
 
-        $(document).on("dblclick", '.existing-form', function(){
+        $(document).on("click", '.existing-form', function(){
             id=$(this).data('value');
             $("#existing-form-"+id).hide();
             $("#existing-label-"+id).show();
@@ -104,15 +104,7 @@ $(document).ready(function() {
 
 
 
-        $(document).on("blur", '.existing-form > input', function(){
-            // Losing focus on text input
-            if ($(this).val().length) {
-                id=$(this).data('value');
-                console.log('HIDE');
-                $("#existing-form-"+id).hide();
-                $("#existing-label-"+id).show();
-            }
-        });
+
         // Reloading the board
         success_funciton = function(data){
             popped_url=$('#list-form').data('url');
@@ -134,8 +126,8 @@ $(document).ready(function() {
                          + '   "'+popped_url+'" '
                           + '  data-value="'+data[a].pk+'"> '
                            + '     <input id="exist-list" class="form-control '
-                           + '      title-column-class" data-value="'+data[a].pk+' '
-                           + '      value='+data[a].fields.name+'>  '
+                           + '      title-column-class" data-value="'+data[a].pk+'"'
+                           + '      value="'+data[a].fields.name+'">'
                            + '     <button name="AddColumn" type="submit" '
                            + '     class="btn btn-success btn-add-list">Update'
                            + '     </button> '
@@ -160,7 +152,7 @@ $(document).ready(function() {
             $('.inner-wrap').html(html);
         }
 
-        $('#list-form').on('submit', function(e){
+        $(document).on('submit','#list-form', function(e){
             e.preventDefault()
             var title = $('#add-list').val()
             data = {
@@ -171,15 +163,20 @@ $(document).ready(function() {
 
             };
         });
-        $('#existing-form').on('submit', function(e){
+
+        $(document).on('submit','.existing-form', function(e){
             e.preventDefault()
-            var title = $('#exist-list').val();
+            id=$(this).data('value');
+            var title = $('.exist-list-' + id).val();
+
+            console.log(title);
             data = {
-                title : title
+                title : title,
+                id : id
             }
             var url = $(this).attr('action');
             $.post(url,data,success_funciton,'json'), function(err){
-                
+
             };
         });
 

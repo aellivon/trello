@@ -206,15 +206,21 @@ class AddColumnView(View):
         all_columns = Column.objects.filter(
             board__id=board_id,archived=False).order_by('position')
         data=serializers.serialize('json', all_columns)
-        print (data)
         return HttpResponse(data)
 
 class UpdateColumnView(View):
 
     def post(self, *args, **kwargs):
-        print ("Hi!")
-        
-        
+        title = self.request.POST.get('title')
+        board_id = self.kwargs.get('id')
+        to_update_id = self.request.POST.get('id')
+        Column.objects.filter(id=to_update_id).update(
+            name=title)
+        all_columns = Column.objects.filter(
+            board__id=board_id,archived=False).order_by('position')
+        data=serializers.serialize('json', all_columns)
+        return HttpResponse(data)
+
 
 
 class UserValidationView(TemplateView):
