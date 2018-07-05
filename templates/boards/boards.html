@@ -226,9 +226,10 @@
         <div class="inner-wrap">
             {% for column in columns %}
             <div class="floatbox">
+              <!-- Column name -->
                    <div id="existing-label-{{column.id}}" class="existing-reactor" data-value="{{ column.id }}">
                       <label data-value="{{ column.id }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
-                        <form id="archive-form" action="{% url 'boards:archive_column' %}" data-url="{% url 'boards:archive_column' %}" data-value="{{column.id}}" novalidate="">
+                      <form id="archive-form" action="{% url 'boards:archive_column' %}" data-url="{% url 'boards:archive_column' %}" data-value="{{column.id}}" novalidate="">
                         <a id="archived-settings"  class="list-settings"><button class="link-style list-settings" type="submit">[X]</button></a>
                     </form>
                   </div>
