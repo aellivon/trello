@@ -212,12 +212,12 @@ class UpdateColumnView(View):
 
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
-        board_id = self.kwargs.get('id')
         to_update_id = self.request.POST.get('id')
-        Column.objects.filter(id=to_update_id).update(
-            name=title)
+        column=get_object_or_404(Column,id=to_update_id)
+        column.name = title
+        column.save()
         all_columns = Column.objects.filter(
-            board__id=board_id,archived=False).order_by('position')
+            board__id=column.board.id,archived=False).order_by('position')
         data=serializers.serialize('json', all_columns)
         return HttpResponse(data)
 

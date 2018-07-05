@@ -107,7 +107,8 @@ $(document).ready(function() {
 
         // Reloading the board
         success_funciton = function(data){
-            popped_url=$('#list-form').data('url');
+            add_popped_url=$('#list-form').data('url');
+            update_popped_url=$('.existing-form').data('url');
             $('.inner-wrap').empty();
             var a = 0;
             html = "";
@@ -123,9 +124,9 @@ $(document).ready(function() {
                          + ' </div> '
                          + '   <form  id="existing-form-'+data[a].pk+'" ' 
                          + '   class="existing-form" action='
-                         + '   "'+popped_url+'" '
+                         + '   "'+update_popped_url+'" data-url="' +update_popped_url+'"'
                           + '  data-value="'+data[a].pk+'"> '
-                           + '     <input id="exist-list" class="form-control '
+                           + '     <input id="exist-list-'+data[a].pk+'" class="form-control '
                            + '      title-column-class" data-value="'+data[a].pk+'"'
                            + '      value="'+data[a].fields.name+'">'
                            + '     <button name="AddColumn" type="submit" '
@@ -135,6 +136,7 @@ $(document).ready(function() {
                            + '      class="btn btn-secondary close-add-list"> '
                            + '      Cancel</button>  '
                           + '  </form> </div>';
+
                
                 a+=1;
             }
@@ -143,7 +145,7 @@ $(document).ready(function() {
                   +'<div class="add-input-reactor">'
                       +'<label class="form-control title-column-class non-editable-add-column" placeholder="Add List">Add List</label>'
                   +'</div>'
-                  +'<form id="list-form" action="'+popped_url+'" data-url="'+popped_url+'">'
+                  +'<form id="list-form" action="'+add_popped_url+'" data-url="'+add_popped_url+'">'
                       +'<input id="add-list" class="form-control title-column-class" placeholder="Enter Another List Here"> '
                       +'<button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Add</button> '
                       +'<button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>'
@@ -167,7 +169,7 @@ $(document).ready(function() {
         $(document).on('submit','.existing-form', function(e){
             e.preventDefault()
             id=$(this).data('value');
-            var title = $('.exist-list-' + id).val();
+            var title = $('#exist-list-' + id).val();
 
             console.log(title);
             data = {
