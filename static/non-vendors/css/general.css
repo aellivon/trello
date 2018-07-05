@@ -14,10 +14,19 @@ body {
   
 }
 
+.link-style {
+    margin-top: 5px;
+    float:left;
+     color:inherit;
+     font: inherit;
+     /*border is optional*/
+     border:1px solid #cccccc; 
+     cursor: pointer;
+}
+
 .list-settings{
     color:white;
-    margin-top: 8px;
-    margin-left: -20px;
+    margin-left: -18px;
     float:left;
     background-color:#808080;
     border-color: #808080;

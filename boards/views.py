@@ -221,6 +221,17 @@ class UpdateColumnView(View):
         data=serializers.serialize('json', all_columns)
         return HttpResponse(data)
 
+class ArchiveColumnView(View):
+
+    def post(self, *args, **kwargs):
+        to_update_id = self.request.POST.get('id')
+        column=get_object_or_404(Column,id=to_update_id)
+        column.archived = True
+        column.save()
+        all_columns = Column.objects.filter(
+            board__id=column.board.id,archived=False).order_by('position')
+        data=serializers.serialize('json', all_columns)
+        return HttpResponse(data)
 
 
 class UserValidationView(TemplateView):

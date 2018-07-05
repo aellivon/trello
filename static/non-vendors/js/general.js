@@ -109,6 +109,7 @@ $(document).ready(function() {
         success_funciton = function(data){
             add_popped_url=$('#list-form').data('url');
             update_popped_url=$('.existing-form').data('url');
+            archived_popped_url=$('#archive-form').data('url');
             $('.inner-wrap').empty();
             var a = 0;
             html = "";
@@ -120,7 +121,11 @@ $(document).ready(function() {
                         + 'class="existing-label form-control title-column-class'
                         + ' non-editable-add-column" placeholder="Add List">'
                         + ' '+data[a].fields.name+'</label> '
-                        + '      <a href="#"class="list-settings">X</a> '
+                       +'<form id="archive-form" action="'+archived_popped_url+'"'
+                       +' data-url="'+archived_popped_url+'" data-value="'+data[a].pk+'" novalidate="">'
+                        +'<a id="archived-settings"  class="list-settings">'
+                        +'<button class="link-style list-settings" type="submit">[X]</button></a>'
+                        +'</form>'
                          + ' </div> '
                          + '   <form  id="existing-form-'+data[a].pk+'" ' 
                          + '   class="existing-form" action='
@@ -174,6 +179,21 @@ $(document).ready(function() {
             console.log(title);
             data = {
                 title : title,
+                id : id
+            }
+            var url = $(this).attr('action');
+            $.post(url,data,success_funciton,'json'), function(err){
+
+            };
+        });
+
+
+        $(document).on('submit','#archive-form', function(e){
+            console.log("aa");
+            e.preventDefault()
+            id=$(this).data('value');
+
+            data = {
                 id : id
             }
             var url = $(this).attr('action');

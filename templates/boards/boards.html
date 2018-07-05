@@ -228,7 +228,9 @@
             <div class="floatbox">
                    <div id="existing-label-{{column.id}}" class="existing-reactor" data-value="{{ column.id }}">
                       <label data-value="{{ column.id }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
-                      <a href="#"class="list-settings">X</a>
+                        <form id="archive-form" action="{% url 'boards:archive_column' %}" data-url="{% url 'boards:archive_column' %}" data-value="{{column.id}}" novalidate="">
+                        <a id="archived-settings"  class="list-settings"><button class="link-style list-settings" type="submit">[X]</button></a>
+                    </form>
                   </div>
                     <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' %}" data-url="{% url 'boards:update_column' %}">
                         <input id="exist-list-{{column.id}}" class="form-control title-column-class" data-value="{{column.id}}" value="{{column.name}}"> 
