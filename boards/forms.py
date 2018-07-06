@@ -37,7 +37,7 @@ class MembersModalForm(forms.Form):
         self.board_id = kwargs.pop('board_id', None)
         super(MembersModalForm, self).__init__(*args, **kwargs)
 
-    email = forms.CharField(max_length=100,
+    email = forms.EmailField(
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
 
     def invite(self, host, username, board):
@@ -69,10 +69,13 @@ class MembersModalForm(forms.Form):
         new_referral.user = user
         new_referral.save()
 
-    def remove_member(self, to_remove):
+    def remove_members(self, to_remove):
         # removing members from a board
         for id in to_remove:
             BoardMember.objects.filter(pk=id).delete()
+
+    def remove_member(self, user_id, board):
+        BoardMember.objects.filter(user__id=user_id, board=board).delete()
 
 
     def clean_email(self):

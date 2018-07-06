@@ -44,3 +44,19 @@ class Column(models.Model):
 
     def __str__(self):
         return "{}".format(self.name)
+
+class Card(models.Model):
+    name = models.TextField()
+    description = models.TextField(null=True)
+    column = models.ForeignKey(Column, on_delete=models.CASCADE)
+    due_date = models.DateTimeField(null=True)
+    archived = models.BooleanField(default=False)
+
+class CardMember(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    card = models.ForeignKey(Card, on_delete=models.CASCADE)
+
+class CardComment(models.Model):
+    user =models.ForeignKey(User,on_delete=models.CASCADE)
+    card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    comment = models.TextField()

@@ -89,6 +89,22 @@ $(document).ready(function() {
             }
         });
 
+        $(document).on("click", '.title-card-class', function(){
+            value = $(this).data('value');
+            console.log(value);
+            $(".add-card-reactor-"+value).hide();
+            $("#card-add-form-column-"+value).show();
+            $( "#add-card-reactor-"+value+" > input" ).focus();
+        });
+
+        $(document).on("click", '#close-add-card', function(){
+            
+             value = $(this).data('value');
+            $("#card-add-form-column-"+value).hide();
+            $(".add-card-reactor-"+value).show();
+        });
+
+
         $(document).on("dblclick", '.existing-label', function(){
             id=$(this).data('value');
             $("#existing-label-"+id).hide();
@@ -107,44 +123,108 @@ $(document).ready(function() {
 
         // Reloading the board
         success_funciton = function(data){
+            columns = JSON.parse(data.column);
+            cards = JSON.parse(data.card)
             add_popped_url=$('#list-form').data('url');
             update_popped_url=$('.existing-form').data('url');
             archived_popped_url=$('#archive-form').data('url');
+            add_card_popped_url=$('.toggle-card').data('url');
             $('.inner-wrap').empty();
             var a = 0;
             html = "";
-            while(a < data.length){
+            console.log(columns + " columns");
+            console.log(cards + " cards");
+            console.log(data + " data");
+            while(a < columns.length){
+                console.log('sulod');
+                column_id = columns[a].pk;
+                column_name = columns[a].fields.name
                 html += '<div class="floatbox">' 
-                         + '<div id="existing-label-'+data[a].pk+'"' 
-                       + ' class= "existing-reactor" data-value="'+data[a].pk+'"> '
-                       + ' <label data-value="'+data[a].pk+'" '
+                         + '<div id="existing-label-'+column_id+'"' 
+                       + ' class= "existing-reactor" data-value="'+column_id+'"> '
+                       + ' <label data-value="'+column_id+'" '
                         + 'class="existing-label form-control title-column-class'
                         + ' non-editable-add-column" placeholder="Add List">'
-                        + ' '+data[a].fields.name+'</label> '
+                        + ' '+column_name+'</label> '
                        +'<form id="archive-form" action="'+archived_popped_url+'"'
-                       +' data-url="'+archived_popped_url+'" data-value="'+data[a].pk+'" novalidate="">'
+                       +' data-url="'+archived_popped_url+'" data-value="'+column_id+'" novalidate="">'
                         +'<a id="archived-settings"  class="list-settings">'
                         +'<button class="link-style list-settings" type="submit">[X]</button></a>'
                         +'</form>'
                          + ' </div> '
-                         + '   <form  id="existing-form-'+data[a].pk+'" ' 
+                         + '   <form  id="existing-form-'+column_id+'" ' 
                          + '   class="existing-form" action='
                          + '   "'+update_popped_url+'" data-url="' +update_popped_url+'"'
-                          + '  data-value="'+data[a].pk+'"> '
-                           + '     <input id="exist-list-'+data[a].pk+'" class="form-control '
-                           + '      title-column-class" data-value="'+data[a].pk+'"'
-                           + '      value="'+data[a].fields.name+'">'
+                          + '  data-value="'+column_id+'"> '
+                           + '     <input id="exist-list-'+column_id+'" class="form-control '
+                           + '      title-column-class" data-value="'+column_id+'"'
+                           + '      value="'+column_name+'">'
                            + '     <button name="AddColumn" type="submit" '
                            + '     class="btn btn-success btn-add-list">Update'
                            + '     </button> '
                             + '    <button id="close-add-list" type="button" '
                            + '      class="btn btn-secondary close-add-list"> '
                            + '      Cancel</button>  '
-                          + '  </form> </div>';
+                          + '  </form>';
+                             b = 0;
+                             while(b < cards.length){
+                                if (cards[b].fields.column == columns[a].pk){
+                                    html+= '<div id="existing-card-'+column_id+'"'
+                                      +' class="card-reactor" data-value="'+column_id+'">'
+                                      + '           <center>'
+                                      + '           <label data-value="'+column_id+'"'
+                                      +' class=" form-control card-column-class'
+                                      +' non-editable-add-card">'+cards[b].fields.name+'</label>'
+                                      + '           </center>'
+                                      + '           <form id="archive-form"'
+                                      +' action=""'
+                                      +' data-url=""'
+                                      + ' data-value="'+column_id+'" novalidate="">'
+                                      + '         </form>'
+                                      + '       </div>';
+                                }
+                                b+=1;
+                             }
+                              html += '   <!-- Add Card -->'
+                                      + '         <form  id="existing-form-'+column_id+'"'
+                                      + ' class="existing-form"  data-value="'+column_id+'"'
+                                      + ' action=""'
+                                      + ' data-url="">'
+                                      + ' <input id="exist-list-'+column_id+'"'
+                                      + ' class="form-control title-column-class"'
+                                      + 'data-value="'+column_id+'" value="'+column_name+'"> '
+                                      + ' <button name="AddColumn" type="submit"'
+                                      + 'class="btn btn-success btn-add-list">Update</button>' 
+                                      + '<button id="close-add-list" type="button" class="btn'
+                                      + 'btn-secondary close-add-list">Cancel</button>'  
+                                      + '         </form>'
+                                      + '       <div class="add-card-reactor-'+column_id+'">'
+                                      + '         <label class="form-control title-card-class'
+                                      +' non-editable-add-card" data-value="'+column_id+'"'
+                                      +' placeholder="Add List">Add Card</label>'
+                                      + '     </div>'
+                                      + '     <form id="card-add-form-column-'+column_id+'"'
+                                      + 'class="card-add-form-class toggle-card"'
+                                      + 'action="'+add_card_popped_url+'"'
+                                      + 'data-url="'+add_card_popped_url+'"' 
+                                      + 'data-value="'+column_id+'">'
+                                      + '         <input id="add-card-'+column_id+'"' 
+                                      + 'class="form-control title-column-class" '
+                                      +' placeholder="Enter Another Card Here"> '
+                                      + ' <button name="AddColumn" type="submit"'
+                                      + 'class="btn btn-success btn-add-card">Add</button>'
+                                      + '<button id="close-add-card" data-value="'+column_id+'"'
+                                      + 'type="button" class="btn btn-secondary close-add-card">'
+                                      + 'Cancel</button>'
+                                      + '     </form>'
+                                      + ' </div>';
+                               html+=' </div>';
 
                
                 a+=1;
             }
+
+
 
             html += '<div class="floatbox">'
                   +'<div class="add-input-reactor">'
@@ -155,7 +235,7 @@ $(document).ready(function() {
                       +'<button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Add</button> '
                       +'<button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>'
                   +'</form>'
-              +'</div>'
+              +'</div>';
             $('.inner-wrap').html(html);
         }
 
@@ -199,6 +279,22 @@ $(document).ready(function() {
             var url = $(this).attr('action');
             $.post(url,data,success_funciton,'json'), function(err){
 
+            };
+        });
+
+
+        $(document).on('submit','.card-add-form-class', function(e){
+            console.log("hello");
+            e.preventDefault()
+            id=$(this).data('value');
+            name = $("#add-card-"+id).val();
+            data = {
+                name : name,
+                id : id
+            }
+            var url = $(this).attr('action');
+            $.post(url,data,success_funciton,'json'), function(err){
+                console.log('error');
             };
         });
 

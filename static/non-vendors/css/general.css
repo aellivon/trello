@@ -11,7 +11,19 @@ html,body {
 }
 body {
   display:flex;
-  
+}
+.toggle-card{
+    display: none;
+}
+.btn-add-card{
+    margin-top: 10px;
+}
+
+.close-add-card{
+     margin-top: 10px;
+}
+.dropdown-right{
+    margin-right: 10px;
 }
 
 .link-style {
@@ -28,8 +40,8 @@ body {
     color:white;
     margin-left: -18px;
     float:left;
-    background-color:#808080;
-    border-color: #808080;
+    background-color:black;
+    border-color: black;
     color: white;
     z-index: 10;
 }
@@ -41,6 +53,8 @@ body {
 #list-form{
 	display:none;
 }
+
+
 
 .custom-navbar{
 	position: absolute;
@@ -156,18 +170,29 @@ hr.border{
 	height: 35px;
 }
 
+.card-column-class{
+    height: 70px;
+}
+
+
 .btn-add-list{
 	margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .close-add-list{
 	margin-top: 5px;
 }
 
-
+.non-editable-add-card{
+    float: left;    
+    background-color:#808080;
+    border-color: #808080;
+    color: white;
+}
 .non-editable-add-column{
     float: left;
-	background-color:#808080;
+	background-color:black;
 	border-color: #808080;
     color: white;
 }
