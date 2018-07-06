@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from .models import User
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView
-from .models import Board, BoardMember, Referral
+from django.views.generic import TemplateView, View
+from .models import Board, BoardMember, Referral, Column
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
@@ -11,6 +11,9 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
+from django.http import JsonResponse
+from django.core import serializers
+from django.db.models import Max
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -27,7 +30,8 @@ class IndexView(LoginRequiredMixin,TemplateView):
         context = self.form()
         username = self.kwargs.get('username')
         user = get_object_or_404(User,username=username)
-        boards = BoardMember.objects.filter(user=user,board__archived=False,is_confirmed=True)
+        boards = BoardMember.objects.filter(
+            user=user,board__archived=False,is_confirmed=True)
         return render(self.request, self.template_name,
             {'form':context, 'boards': boards, 'current_user' : username}
         )
@@ -39,13 +43,15 @@ class IndexView(LoginRequiredMixin,TemplateView):
         user = get_object_or_404(User,username=username)
         if form.is_valid():
             form.save_board(user)
-            boards = BoardMember.objects.filter(user=user,board__archived=False,is_confirmed=True)
+            boards = BoardMember.objects.filter(
+                user=user,board__archived=False,is_confirmed=True)
             form = self.form()
             return render(self.request, self.template_name,
                 {'form':form, 'boards': boards, 'current_user' : username}
             )
         else:
-             boards = BoardMember.objects.filter(user=user,board__archived=False,is_confirmed=True)
+             boards = BoardMember.objects.filter(
+                user=user,board__archived=False,is_confirmed=True)
         
         return render(self.request, self.template_name, 
             {'form':form, 'boards': boards, 'current_user' : username}
@@ -71,6 +77,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
         board = get_object_or_404(Board,pk=board_id)
         board_member = BoardMember.objects.filter(
             board__id=board_id).exclude(user=board.owner)
+        columns = Column.objects.filter(
+            board__id=board_id,archived=False).order_by('position')
         owner = False
         if board.owner == self.request.user:
             owner = True
@@ -78,7 +86,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
             {
                 'board_form': board_form, 'member_form': member_form,
                 'board':board, 'current_user' : username, 'message_box': None,
-                'owner' : owner, 'board_member' : board_member
+                'owner' : owner, 'board_member' : board_member, 'columns' : columns
             }
         )
 
@@ -89,6 +97,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
         access = get_object_or_404(BoardMember,user__username=username,
             is_confirmed=True,board__id=board_id)
         board = get_object_or_404(Board,pk=board_id)
+        columns = Column.objects.filter(
+            board__id=board_id,archived=False).order_by('position')
         owner = False
         board_member = BoardMember.objects.filter(
             board__id=board_id).exclude(user=board.owner)
@@ -177,7 +187,52 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 }
             )
 
-        return HttpResponseBadRequest()
+class AddColumnView(View):
+    """
+    """
+
+    def post(self, *args, **kwargs):
+        title = self.request.POST.get('title')
+        board_id = self.kwargs.get('id')
+        board = get_object_or_404(Board,pk=board_id)
+        max_position=Column.objects.filter(archived=False).aggregate(Max('position'))
+        to_add_position = 1 
+        maximum_exists = max_position.get('position__max')
+        if  maximum_exists:
+            to_add_position =   maximum_exists + 1
+        new_column = Column(board=board,name=title,position=to_add_position)
+
+        new_column.save()
+        all_columns = Column.objects.filter(
+            board__id=board_id,archived=False).order_by('position')
+        data=serializers.serialize('json', all_columns)
+        return HttpResponse(data)
+
+class UpdateColumnView(View):
+
+    def post(self, *args, **kwargs):
+        title = self.request.POST.get('title')
+        to_update_id = self.request.POST.get('id')
+        column=get_object_or_404(Column,id=to_update_id)
+        column.name = title
+        column.save()
+        all_columns = Column.objects.filter(
+            board__id=column.board.id,archived=False).order_by('position')
+        data=serializers.serialize('json', all_columns)
+        return HttpResponse(data)
+
+class ArchiveColumnView(View):
+
+    def post(self, *args, **kwargs):
+        to_update_id = self.request.POST.get('id')
+        column=get_object_or_404(Column,id=to_update_id)
+        column.archived = True
+        column.save()
+        all_columns = Column.objects.filter(
+            board__id=column.board.id,archived=False).order_by('position')
+        data=serializers.serialize('json', all_columns)
+        return HttpResponse(data)
+
 
 class UserValidationView(TemplateView):
     """
