@@ -10,3 +10,4 @@ class ThrowHomeIfLoggedInMixIn(object):
                     request.user.get_username() 
                 }))
         return super().dispatch(request, *args, **kwargs)
+

@@ -8,7 +8,7 @@ class Board(models.Model):
     archived = models.BooleanField(default=False)
     
     def __str__(self):
-        return "{}/{}".format(self.name , self.owner) 
+        return "{}-{}".format(self.name , self.owner) 
 
 
 class BoardMember(models.Model):
@@ -24,7 +24,6 @@ class Referral(models.Model):
     token = models.TextField()
     email = models.TextField()
         
-    
     def generate_token(self):
         # Generating secure token using python 3.6 libraries
         not_found = True
@@ -33,3 +32,15 @@ class Referral(models.Model):
             if not Referral.objects.filter(token=new_token):
                 self.token = new_token
                 not_found = False
+
+    def __str__(self):
+        return "{}-referral".format(email)
+
+class Column(models.Model):
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    name = models.TextField()
+    position = models.IntegerField()
+    archived = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{}".format(name)
