@@ -170,6 +170,7 @@
       </div>
     </div>
     </form>
+       
     <!-- leaving confirmation modal -->
      <div class="modal fade modal-fixed" id="LeaveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
@@ -228,6 +229,43 @@
         </div>
 
     {% endif %}
+     <!-- card modal-->
+     <!-- Large modal -->
+    <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+           <div class="modal-content">
+              <div class="modal-header">
+
+                <h5 class="modal-title" id="exampleModalLabel">Card Title</h5>
+                  <div class="dropdown ml-auto text-right">
+                    <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Members
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                      <a class="dropdown-item" data-toggle="modal" data-target="#AddMemberModal">Invite Member</a>
+                      {% if board_member %}
+                          <a class="dropdown-item" data-toggle="modal" data-target="#RemoveMemberModal">Remove Member</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+
+              </div>
+                                    
+              <div class="card-description" name="" novalidate="">
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+                  <div class="modal-footer">
+
+
+                    <button name="MessageBoxModalAlert" class="btn btn-primary" data-dismiss="modal">{{ message_box.button }}</button>
+                  </div>
+            </div>
+            </div>
+      </div>
+    </div>
     <!-- Design for page elements -->
     <div class="row custom-row">
         <div class="col-lg-8 col-md-6 col-sm-5 col-xs-5 ">
@@ -298,7 +336,7 @@
                    
                 {% for card in cards %}
                     {% if card.column == column %}
-                      <div id="existing-card-{{column.id}}" class="card-reactor" data-value="{{ column.id }}">
+                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor " data-toggle="modal" data-target="#CardModal" data-value="{{ column.id }}">
                         <center>
                         <label data-value="{{ column.id }}" class=" form-control card-column-class non-editable-add-card">{{card.name}}</label>
                         </center>
@@ -338,8 +376,12 @@
                       <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  
                   </form>
               </div>
+                <!--  Used for bug fixing a new board -->
+                  
         </div>  
     </div>
 </div>
-        
+      <input id="hidden-card-add-values" type="hidden" value="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}"></input>
+      <input id="hidden-column-archive-values" type="hidden" value="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}"></input>
+      <input id="hidden-column-update-values" type="hidden" value="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}"></input>  
 {% endblock %}

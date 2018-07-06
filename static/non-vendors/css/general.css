@@ -54,7 +54,15 @@ body {
 	display:none;
 }
 
+.class-card-modal{
+    width: 850px !important;
+}
 
+.card-description{
+    text-indent: 40px;
+    padding: 30px;
+    text-align: justify;
+}
 
 .custom-navbar{
 	position: absolute;

@@ -32,7 +32,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
         username = self.kwargs.get('username')
         user = get_object_or_404(User,username=username)
         boards = BoardMember.objects.filter(
-            user=user,board__archived=False,is_confirmed=True)
+            user=user,board__archived=False,is_confirmed=True).order_by('-pk')
         return render(self.request, self.template_name,
             {'form':context, 'boards': boards, 'current_user' : username}
         )
@@ -45,7 +45,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
         if form.is_valid():
             form.save_board(user)
             boards = BoardMember.objects.filter(
-                user=user,board__archived=False,is_confirmed=True)
+                user=user,board__archived=False,is_confirmed=True).order_by('-pk')
             form = self.form()
             return render(self.request, self.template_name,
                 {'form':form, 'boards': boards, 'current_user' : username}
@@ -275,6 +275,7 @@ class ArchiveColumnView(View):
 class AddCardView(View):
 
     def post(self, *args, **kwargs):
+        print ("HI!")
         name = self.request.POST.get('name')
         column_id = self.request.POST.get('id')
         board_id = self.kwargs.get('id')

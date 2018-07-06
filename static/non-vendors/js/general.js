@@ -122,13 +122,13 @@ $(document).ready(function() {
 
 
         // Reloading the board
-        success_funciton = function(data){
+        reload_inner_wrapper = function(data){
             columns = JSON.parse(data.column);
             cards = JSON.parse(data.card)
             add_popped_url=$('#list-form').data('url');
-            update_popped_url=$('.existing-form').data('url');
-            archived_popped_url=$('#archive-form').data('url');
-            add_card_popped_url=$('.toggle-card').data('url');
+            archived_popped_url = $('#hidden-column-archive-values').val();
+            update_popped_url = $('#hidden-column-update-values').val();
+            add_card_popped_url = $('#hidden-card-add-values').val();
             $('.inner-wrap').empty();
             var a = 0;
             html = "";
@@ -170,7 +170,8 @@ $(document).ready(function() {
                              while(b < cards.length){
                                 if (cards[b].fields.column == columns[a].pk){
                                     html+= '<div id="existing-card-'+column_id+'"'
-                                      +' class="card-reactor" data-value="'+column_id+'">'
+                                      +' class="card-reactor" data-toggle="modal" data-target="#CardModal"'
+                                      +' data-value="'+column_id+'">'
                                       + '           <center>'
                                       + '           <label data-value="'+column_id+'"'
                                       +' class=" form-control card-column-class'
@@ -239,6 +240,7 @@ $(document).ready(function() {
             $('.inner-wrap').html(html);
         }
 
+
         $(document).on('submit','#list-form', function(e){
             e.preventDefault()
             var title = $('#add-list').val()
@@ -246,7 +248,8 @@ $(document).ready(function() {
                 title : title
             }
             var url = $(this).attr('action');
-            $.post(url,data,success_funciton,'json'), function(err){
+             console.log(url);
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
 
             };
         });
@@ -262,14 +265,18 @@ $(document).ready(function() {
                 id : id
             }
             var url = $(this).attr('action');
-            $.post(url,data,success_funciton,'json'), function(err){
+
+            console.log(url);
+            if (url == undefined){
+                url = $('#hidden-column-update-values').val();
+            }
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
 
             };
         });
 
 
         $(document).on('submit','#archive-form', function(e){
-            console.log("aa");
             e.preventDefault()
             id=$(this).data('value');
 
@@ -277,7 +284,12 @@ $(document).ready(function() {
                 id : id
             }
             var url = $(this).attr('action');
-            $.post(url,data,success_funciton,'json'), function(err){
+
+            console.log(url);
+            if (url == undefined){
+                url = $('#hidden-column-archive-values').val();
+            }
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
 
             };
         });
@@ -287,13 +299,19 @@ $(document).ready(function() {
             console.log("hello");
             e.preventDefault()
             id=$(this).data('value');
+            console.log($(this).attr('action'));
             name = $("#add-card-"+id).val();
             data = {
                 name : name,
                 id : id
             }
-            var url = $(this).attr('action');
-            $.post(url,data,success_funciton,'json'), function(err){
+            var url = $('.card-add-form-class').attr('action');
+            if (url == undefined){
+                url = $('#hidden-card-add-values').val();
+                console.log(url);
+            }
+                
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
                 console.log('error');
             };
         });
