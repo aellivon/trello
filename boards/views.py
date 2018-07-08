@@ -9,11 +9,10 @@ from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadReques
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .mixins import AJAXBoardMixIn
 from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
-import json as simplejson
-from django.core import serializers
 from django.db.models import Max
 
 
@@ -77,7 +76,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
             is_confirmed=True,board__id=board_id)
         board = get_object_or_404(Board,pk=board_id)
         board_member = BoardMember.objects.filter(
-            board__id=board_id).exclude(user=board.owner)
+            board__id=board_id)
         referral = Referral.objects.filter(
             board_member__board__id=board_id).exclude( board_member__user=board.owner)
         columns = Column.objects.filter(
@@ -107,7 +106,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
             board__id=board_id,archived=False).order_by('position')
         owner = False
         board_member = BoardMember.objects.filter(
-            board__id=board_id).exclude(user=board.owner)
+            board__id=board_id)
         referral = Referral.objects.filter(
             board_member__board__id=board_id).exclude( board_member__user=board.owner)
         card = Card.objects.filter(
@@ -212,84 +211,60 @@ class BoardView(LoginRequiredMixin, TemplateView):
             }))
 
 
-class AddColumnView(View):
-    """
-    """
 
+
+# ajax implementation
+class AddColumnView(AJAXBoardMixIn, View):
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
         board_id = self.kwargs.get('id')
+
         board = get_object_or_404(Board,pk=board_id)
         max_position=Column.objects.filter(archived=False).aggregate(Max('position'))
-
         to_add_position = 1 
         maximum_exists = max_position.get('position__max')
         if  maximum_exists:
             to_add_position =   maximum_exists + 1
         new_column = Column(board=board,name=title,position=to_add_position)
         new_column.save()
-        all_columns = Column.objects.filter(
-            board__id=board_id,archived=False).order_by('position')
-        card = Card.objects.filter(
-            column__board__id=board_id,archived=False)
-        serialized_data_card = serializers.serialize('json', card)
-        serialized_data_column = serializers.serialize('json', all_columns)
-        data = { 'column' : serialized_data_column, 'card' : serialized_data_card }
-        return HttpResponse(simplejson.dumps(data))
+        data = self.return_board()
+        return HttpResponse(data)
 
-class UpdateColumnView(View):
+
+
+class UpdateColumnView(AJAXBoardMixIn, View):
 
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
         to_update_id = self.request.POST.get('id')
-        board_id = self.kwargs.get('id')
         column=get_object_or_404(Column,id=to_update_id)
         column.name = title
         column.save()
-        all_columns = Column.objects.filter(
-            board__id=column.board.id,archived=False).order_by('position')
-        card = Card.objects.filter(
-            column__board__id=board_id,archived=False)
-        serialized_data_card = serializers.serialize('json', card)
-        serialized_data_column = serializers.serialize('json', all_columns)
-        data = { 'column' : serialized_data_column, 'card' : serialized_data_card }
-        return HttpResponse(simplejson.dumps(data))
+        data = self.return_board()
+        return HttpResponse(data)
 
-class ArchiveColumnView(View):
+
+class ArchiveColumnView(AJAXBoardMixIn, View):
 
     def post(self, *args, **kwargs):
         to_update_id = self.request.POST.get('id')
         column=get_object_or_404(Column,id=to_update_id)
-        board_id = self.kwargs.get('id')
         column.archived = True
         column.save()
-        all_columns = Column.objects.filter(
-            board__id=column.board.id,archived=False).order_by('position')
-        card = Card.objects.filter(
-            column__board__id=board_id,archived=False)
-        serialized_data_card = serializers.serialize('json', card)
-        serialized_data_column = serializers.serialize('json', all_columns)
-        data = { 'column' : serialized_data_column, 'card' : serialized_data_card }
-        return HttpResponse(simplejson.dumps(data))
+        data = self.return_board()
+        return HttpResponse(data)
 
-class AddCardView(View):
+
+class AddCardView(AJAXBoardMixIn, View):
 
     def post(self, *args, **kwargs):
-        print ("HI!")
         name = self.request.POST.get('name')
         column_id = self.request.POST.get('id')
-        board_id = self.kwargs.get('id')
         column = get_object_or_404(Column,pk=column_id)
         new_card = Card(name=name,column=column)
         new_card.save()
-        all_columns = Column.objects.filter(
-            board__id=board_id,archived=False).order_by('position')
-        card = Card.objects.filter(
-            column__board__id=board_id,archived=False)
-        serialized_data_card = serializers.serialize('json', card)
-        serialized_data_column = serializers.serialize('json', all_columns)
-        data = { 'column' : serialized_data_column, 'card' : serialized_data_card }
-        return HttpResponse(simplejson.dumps(data))
+        data = self.return_board()
+        return HttpResponse(data)
 
 
 class UserValidationView(TemplateView):

@@ -229,6 +229,101 @@
         </div>
 
     {% endif %}
+
+
+            <!-- Inner Confirmation Modal -->
+        <div class="modal fade modal-fixed" id="RemoveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+                  <div class="modal-body">
+                        Are you sure you want to remove these?
+                    </div>
+
+                  <div class="modal-footer">
+                    <button name="RemoveMemberModal" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+
+                  </div>
+          
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Member Modal -->
+    <div class="modal fade modal-fixed" id="CardMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Assigning Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+                                
+
+              <div class="modal-body">
+                    <center>
+                    <div id = "reactor">
+                    </div>
+                    </center>
+                    {% for member in board_member %}
+                        
+                            {% if member.is_confirmed %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                <fieldset id="checkArray">
+                                    <input name="remove_member" class="form-check-input" type="checkbox" value="{{member.id}}">
+                                     {{ member.user.email }}   
+                                     
+
+                                </fieldset>
+                                </label>
+                            </div>
+                            {% endif %}
+                    {% endfor %}
+                </div>
+
+              <div class="modal-footer">
+                  <span id="btnAssignRemove"> <button type="button" class="btn btn-secondary" >Assign</button></span>
+                  <span id="btnAssignCancel"> <button type="button" class="btn btn-secondary" >Cancel</button></span>
+              </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invite Member Modal -->
+    <div class="modal fade modal-fixed" id="DueDateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Invite Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+                                
+          <form name="DueDateModal" method="post" novalidate="">
+            {% csrf_token %}
+
+              <div class="modal-body">
+                    <label for="" class="label-margin">Due Date</label>
+                    <input type="datetime-local" name="bdaytime">
+                </div>
+
+              <div class="modal-footer">
+                <button name="DueDateModal" type="submit" class="btn btn-primary">Invite</button>
+              </div>
+        </form>
+        </div>
+      </div>
+    </div>
      <!-- card modal-->
      <!-- Large modal -->
     <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -236,33 +331,68 @@
            <div class="modal-content">
               <div class="modal-header">
 
-                <h5 class="modal-title" id="exampleModalLabel">Card Title</h5>
-                  <div class="dropdown ml-auto text-right">
-                    <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Members
-                    </a>
+                <h3 id="heading-card-title" class="modal-title card-class-title" id="exampleModalLabel"><strong>Card Title</strong></h3>
+                 <input id="input-card-title" class="form-control card-class-title display-none" value="Card Title"> 
 
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                      <a class="dropdown-item" data-toggle="modal" data-target="#AddMemberModal">Invite Member</a>
-                      {% if board_member %}
-                          <a class="dropdown-item" data-toggle="modal" data-target="#RemoveMemberModal">Remove Member</a>
-                      {% endif %}
-                    </div>
-                  </div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
 
               </div>
-                                    
-              <div class="card-description" name="" novalidate="">
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
-                  <div class="modal-footer">
+              <div class="modal-body">
+                 <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                      <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>
 
+               </div>
+                <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">
+                      <h5 class="modal-label-manage" id="exampleModalLabel">Manage</h5>
+               </div>
+                 <div class="left-portion-of-modal col-lg-9 col-md-9 col-sm-9">
 
-                    <button name="MessageBoxModalAlert" class="btn btn-primary" data-dismiss="modal">{{ message_box.button }}</button>
+                    <textarea readonly id="text-class-description" class="textarea class-description" placeholder="Card Description"></textarea>
+
+                    <button name="" id="card-button-add-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
+                    <button name="" id="card-button-cancel-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>
                   </div>
-            </div>
+
+                  <div class="right-portion-of-modal col-lg-3 col-md-3 col-sm-3">
+                      <button data-toggle="modal" data-target="#CardMemberModal"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>
+                      <button data-toggle="modal" data-target="#DueDateModal" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>
+                      <button name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Archive</button>
+
+                  </div>
+                  <!-- Bottom Part -->
+                  <div id="hr-after-description"class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                    <hr class="hr">
+                </div>
+                <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                      <h5 class="modal-card-add-comment" id="exampleModalLabel">Add Comment</h5>
+                      <textarea id="text-comment-area" class="textarea" placeholder="Write a comment"></textarea>
+                      <button id="card-button-add-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>
+                       <button id="card-button-cancel-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Cancel</button>
+
+               </div>
+               <!-- Comments -->
+               <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                    <hr class="hr">
+                </div>
+                <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                      <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>
+               </div>
+               <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                    <hr class="hr">
+                </div>
+                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+
+                      <p class="card-comment-user" id="exampleModalLabel"><strong>Card User</strong> (4 hours ago)</p>
+                      
+                      <div class="card-comments" name="" novalidate="">
+                          Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
+                      </div>
+                      <a class="float-left additional-option-comment">Edit</a> <a class="float-left additional-option-comment">Delete</a>
+                  </div>
+                
+                 </div>
             </div>
       </div>
     </div>

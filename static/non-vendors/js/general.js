@@ -47,9 +47,13 @@ $(document).ready(function() {
                 Please check at least one checkbox to remove!</label>');
             }
         });
+
         $('#RemoveConfirmationModal').on('hidden.bs.modal', function () {
-            // Throws error if nothing is checked
                 $('#RemoveMemberModal').modal('show');
+        })
+
+        $('#CardMemberModal').on('hidden.bs.modal', function () {
+                $('#CardModal').modal('show');
         })
 
         if ($('div.error-box-index').length) {
@@ -117,7 +121,49 @@ $(document).ready(function() {
             $("#existing-form-"+id).hide();
             $("#existing-label-"+id).show();
         });
+        // Decsription Animation
+        $(document).on("dblclick", "#text-class-description", function(){
+            if($('#text-class-description').prop('readonly')){
 
+               $('#text-class-description').attr("readonly",false);
+               $("#card-button-add-description").removeClass('display-none');
+               $("#card-button-cancel-description").removeClass('display-none');
+               $( "#hr-after-description" ).addClass( "mt-4" );
+            }
+        });
+        $(document).on("click", "#card-button-cancel-description", function(){
+          $('#text-class-description').attr("readonly",true);
+          $("#card-button-add-description").addClass('display-none');
+          $("#card-button-cancel-description").addClass('display-none');
+          $( "#hr-after-description" ).removeClass( "mt-4" );
+        });
+
+        // Comment Animation
+        $(document).on("click", "#text-comment-area", function(){
+            $("#card-button-add-comment").removeClass('display-none');
+            $("#card-button-cancel-comment").removeClass('display-none');
+           
+          });
+        $(document).on("click", "#card-button-cancel-comment", function(){
+          $("#card-button-add-comment").addClass('display-none');
+          $("#card-button-cancel-comment").addClass('display-none');
+        });
+
+        // Animation for card title
+        $(document).on("click", "#heading-card-title", function(){
+          $("#heading-card-title").addClass('display-none');
+          $("#input-card-title").removeClass('display-none');
+          $("#input-card-title").focus();
+        });
+
+        $(document).on("blur", "#input-card-title", function(){
+          $("#input-card-title").addClass('display-none');
+          $("#heading-card-title").removeClass('display-none');
+        });
+
+        $(document).on("input", "#input-card-title", function(){
+          // catch when input is change - for saving
+        });
 
 
 
@@ -131,12 +177,7 @@ $(document).ready(function() {
             add_card_popped_url = $('#hidden-card-add-values').val();
             $('.inner-wrap').empty();
             var a = 0;
-            html = "";
-            console.log(columns + " columns");
-            console.log(cards + " cards");
-            console.log(data + " data");
-            while(a < columns.length){
-                console.log('sulod');
+            html = "";            while(a < columns.length){
                 column_id = columns[a].pk;
                 column_name = columns[a].fields.name
                 html += '<div class="floatbox">' 

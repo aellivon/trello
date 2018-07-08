@@ -60,3 +60,4 @@ class CardComment(models.Model):
     user =models.ForeignKey(User,on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
     comment = models.TextField()
+    date_commented = models.DateTimeField(auto_now_add=True, blank=True)
