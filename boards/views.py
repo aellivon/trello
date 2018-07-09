@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import User
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, View
-from .models import Board, BoardMember, Referral, Column, Card
+from .models import Board, BoardMember, Referral, Column, Card, CardComment
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
@@ -13,6 +13,8 @@ from .mixins import AJAXBoardMixIn
 from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
+import json as simplejson
+from django.core import serializers
 from django.db.models import Max
 
 
@@ -91,7 +93,7 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 'board_form': board_form, 'member_form': member_form,
                 'board':board, 'current_user' : username, 'message_box': None,
                 'owner' : owner, 'board_member' : board_member, 'columns' : columns,
-                'referral' : referral, 'cards': card
+                'referral' : referral, 'cards': card, 'owner_instance' : board.owner
             }
         )
 
@@ -126,7 +128,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
                             'board_form': board_form, 'member_form': member_form,
                             'board':board, 'current_user' : username,
                             'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                            'columns' : columns, 'referral': referral, 'cards': card
+                            'columns' : columns, 'referral': referral, 'cards': card,
+                            'owner_instance' : board.owner
                         }
                     )
             # Failing validation will render this template below
@@ -135,7 +138,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
                  'board_form': board_form, 'member_form': member_form,
                  'board':board, 'current_user' : username,
                  'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                 'columns' : columns, 'referral' : referral, 'cards': card
+                 'columns' : columns, 'referral' : referral, 'cards': card, 
+                 'owner_instance' : board.owner
                 }
             )
         # Archiving Board Form
@@ -153,7 +157,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
                     'board_form': board_form, 'member_form': member_form,
                     'board':board, 'current_user' : username,
                     'message_box': None, 'owner' : owner, 'board_member' : board_member,
-                     'columns' : columns, 'referral':referral, 'cards': card
+                     'columns' : columns, 'referral':referral, 'cards': card,
+                     'owner_instance' : board.owner
                 }
             )
         # Inviting a member form
@@ -175,7 +180,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
                        'board_form': board_form, 'member_form': member_form,
                        'board':board, 'current_user' : username,
                         'message_box':message_box, 'owner' : owner, 'board_member' : board_member,
-                        'columns' : columns, 'referral' : referral, 'cards': card
+                        'columns' : columns, 'referral' : referral, 'cards': card,
+                        'owner_instance' : board.owner
                     }
                 )
 
@@ -185,7 +191,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
                    'board_form': board_form, 'member_form': member_form,
                    'board':board, 'current_user' : username,
                    'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                    'columns' : columns, 'referral' : referral, 'cards': card
+                    'columns' : columns, 'referral' : referral, 'cards': card,
+                    'owner_instance' : board.owner
                 }
             )
         elif 'RemoveMemberModal' in self.request.POST:
@@ -198,7 +205,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
                    'board_form': board_form, 'member_form': member_form,
                    'board':board, 'current_user' : username,
                    'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                    'columns' : columns, 'referral' : referral, 'cards': card
+                    'columns' : columns, 'referral' : referral, 'cards': card,
+                    'owner_instance' : board.owner
                 }
             )
         elif 'LeaveConfirmationModal' in self.request.POST:
@@ -265,6 +273,27 @@ class AddCardView(AJAXBoardMixIn, View):
         new_card.save()
         data = self.return_board()
         return HttpResponse(data)
+
+class GetCardDetails(View):
+    def get(self, *args, **kwargs):
+        card_id = self.request.GET.get('card_id')
+        # brackets are needed since they are single objects
+        card = [get_object_or_404(Card,pk=card_id)]
+        card_comments = CardComment.objects.filter(card__id=card_id).select_related('user')
+        serialized_data_cards = serializers.serialize('json', card)
+        if card_comments:
+            serialized_data_comments = serializers.serialize('json', card_comments, 
+                use_natural_foreign_keys=True)
+            data = { 'cards' : serialized_data_cards,
+                 'comments' : serialized_data_comments}
+        else:
+            data = { 'cards' : serialized_data_cards}
+        return HttpResponse(simplejson.dumps(data))
+
+class UpdateCardTitle(View):
+    def post(self, *args, **kwargs):
+        print ("hi")
+
 
 
 class UserValidationView(TemplateView):

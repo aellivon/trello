@@ -33,6 +33,7 @@ $(document).ready(function() {
             }
         });
 
+        // Animations
         $(document).on("click", '#btnRemove', function(){
             // Sequence of prompting and error of removing members
             var atLeastOneIsChecked = $('input[name="remove_member"]:checked').length > 0;
@@ -52,7 +53,44 @@ $(document).ready(function() {
                 $('#RemoveMemberModal').modal('show');
         })
 
+
+        $(document).on("click", '#EditComment', function(){
+                console.log("hi");
+                card_id=$(this).data('value');
+                console.log(card_id);
+                $('#DivisionComment-'+card_id).addClass('display-none');
+                $('#InputComment-'+card_id).removeClass('display-none');
+                $('#EditComment').addClass('display-none');
+                $('#DeleteComment').addClass('display-none');
+                $("#card-save-button").removeClass('display-none');
+                $("#card-cancel-button").removeClass('display-none');
+        })
+
+         $(document).on("click", '#card-cancel-button', function(){
+                card_id=$(this).data('value');
+                console.log(card_id);
+                $('#DivisionComment-'+card_id).removeClass('display-none');
+                $('#InputComment-'+card_id).addClass('display-none');
+                $('#EditComment').removeClass('display-none');
+                $('#DeleteComment').removeClass('display-none');
+                $("#card-save-button").addClass('display-none');
+                $("#card-cancel-button").addClass('display-none');
+        })
+
+
+        $('#DeleteCommentModal').on('hidden.bs.modal', function () {
+                $('#CardModal').modal('show');
+        })
+
         $('#CardMemberModal').on('hidden.bs.modal', function () {
+                $('#CardModal').modal('show');
+        })
+
+        $('#ArchiveCardConfirmation').on('hidden.bs.modal', function () {
+                $('#CardModal').modal('show');
+        })
+
+        $('#DueDateModal').on('hidden.bs.modal', function () {
                 $('#CardModal').modal('show');
         })
 
@@ -73,7 +111,8 @@ $(document).ready(function() {
         }
         
 
-        // Animations 
+        
+        // Adding a column animation
         $(document).on("click", '.add-input-reactor', function(){
             $(".add-input-reactor").hide();
             $("#list-form").show();
@@ -93,6 +132,7 @@ $(document).ready(function() {
             }
         });
 
+
         $(document).on("click", '.title-card-class', function(){
             value = $(this).data('value');
             console.log(value);
@@ -102,13 +142,13 @@ $(document).ready(function() {
         });
 
         $(document).on("click", '#close-add-card', function(){
-            
-             value = $(this).data('value');
+            value = $(this).data('value');
+            console.log(value);
             $("#card-add-form-column-"+value).hide();
             $(".add-card-reactor-"+value).show();
         });
 
-
+        // Existing Columns Animation
         $(document).on("dblclick", '.existing-label', function(){
             id=$(this).data('value');
             $("#existing-label-"+id).hide();
@@ -121,6 +161,7 @@ $(document).ready(function() {
             $("#existing-form-"+id).hide();
             $("#existing-label-"+id).show();
         });
+
         // Decsription Animation
         $(document).on("dblclick", "#text-class-description", function(){
             if($('#text-class-description').prop('readonly')){
@@ -161,16 +202,128 @@ $(document).ready(function() {
           $("#heading-card-title").removeClass('display-none');
         });
 
-        $(document).on("input", "#input-card-title", function(){
-          // catch when input is change - for saving
-        });
 
 
+        function formatDate(date) {
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1, 
+                day = date.getDate(),
+                hour = date.getHours(),
+                minute = date.getMinutes(),
+                second = date.getSeconds(),
+                hourFormatted = hour % 12 || 12, 
+                minuteFormatted = minute < 10 ? "0" + minute : minute,
+                morning = hour < 12 ? "am" : "pm";
+
+            return month + "/" + day + "/" + year + " " + hourFormatted + ":" +
+                    minuteFormatted + morning;
+        }
+
+        // Reloading the card
+        reload_card = function(data){
+            $(".class-details-reactor").empty();
+            console.log(data);
+            cards=JSON.parse(data.cards);
+            comments=JSON.parse(data.comments);
+            card_name = cards[0].fields.name;
+            card_description = cards[0].fields.description;
+            if (card_description==null){
+              card_description="";
+            }
+            console.log(name);
+            html = ""
+            html += ' <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">'
+                  +'<div class="modal-dialog modal-lg">'
+                   +'    <div class="modal-content">'
+                   +'       <div class="modal-header">'
+
+                   +'         <h3 id="heading-card-title" class="modal-title card-class-title" id="exampleModalLabel"><strong>'+card_name+'</strong></h3>'
+                  +'          <input id="input-card-title" class="form-control card-class-title display-none" value="'+card_name+'"> '
+                   +'         <button type="button" class="close" data-dismiss="modal" aria-label="Close">'
+                   +'           <span aria-hidden="true">&times;</span>'
+                   +'         </button>'
+
+                   +'       </div>'
+                   +'       <div class="modal-body">'
+                   +'          <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
+                   +'               <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>'
+
+                   +'        </div>'
+                    +'        <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">'
+                    +'              <h5 class="modal-label-manage" id="exampleModalLabel">Manage</h5>'
+                    +'       </div>'
+                    +'         <div class="left-portion-of-modal col-lg-9 col-md-9 col-sm-9">'
+
+                    +'            <textarea readonly id="text-class-description" class="textarea class-description" placeholder="Card Description">'+card_description+'</textarea>'
+
+                     +'           <button name="" id="card-button-add-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>'
+                    +'            <button name="" id="card-button-cancel-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>'
+                    +'          </div>'
+
+                     +'         <div class="right-portion-of-modal col-lg-3 col-md-3 col-sm-3">'
+                     +'             <button data-toggle="modal" data-target="#CardMemberModal"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>'
+                     +'             <button data-toggle="modal" data-target="#DueDateModal" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>'
+                     +'             <button  data-toggle="modal" data-target="#ArchiveCardConfirmation"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Archive</button>'
+
+                     +'         </div>'
+                      +'        <!-- Bottom Part -->'
+                     +'         <div id="hr-after-description"class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">'
+                     +'           <hr class="hr">'
+                     +'       </div>'
+                     +'       <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
+                     +'             <h5 class="modal-card-add-comment" id="exampleModalLabel">Add Comment</h5>'
+                     +'             <textarea id="text-comment-area" class="textarea" placeholder="Write a comment"></textarea>'
+                      +'            <button id="card-button-add-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>'
+                     +'              <button id="card-button-cancel-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Cancel</button>'
+
+                     +'      </div>';
+                     if(comments){
+                            html += '      <!-- Comments -->'
+                         +'      <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">'
+                         +'           <hr class="hr">'
+                         +'       </div>'
+                          +'      <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
+                          +'            <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>'
+                          +'     </div>';
+                     }
+                    
+                      index = 0;
+                      while(index < comments.length){
+                            date_commented = new Date(comments[index].fields.date_commented);
+                            date_commented = formatDate(date_commented);
+                            html +='      <!-- To Loop -->'
+                            +'       <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">'
+                            +'            <hr class="hr">'
+                             +'       </div>'
+                             +'         <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
+
+                             +'             <p class="card-comment-user" id="exampleModalLabel"><strong>'+comments[index].fields.user+'</strong> ('+date_commented+')</p>'
+                             +'             '
+                             +'             <div  id="DivisionComment-'+comments[index].pk+'" class="card-comments" name="" novalidate="">'+comments[index].fields.comment+'</div>'
+                             +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none">'+comments[index].fields.comment+'</textarea>'
+
+                             +'             <button data-value="'+comments[index].pk+'" id="EditComment" class="float-left additional-option-comment link-style btn btn-warning">Edit</button>'
+                             +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
+                             +'           <button data-value="'+comments[index].pk+'" name="" id="card-save-button" class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>'
+                             +'           <button data-value="'+comments[index].pk+'" name="" id="card-cancel-button"class="btn btn-secondary card-button-add-description mr-2 mt-1 float-right display-none">Cancel</button>'
+                             +'         </div>'
+                             +'      '
+                             +'               '
+                              +'      <!-- Too Loop? -->';
+             
+                            index+=1;
+                      }
+                      html+=' </div>'
+                            +'    </div>'
+                            +'  </div>';
+             $(".class-details-reactor").html(html);
+             $("#CardModal").modal('show');
+        }
 
         // Reloading the board
         reload_inner_wrapper = function(data){
             columns = JSON.parse(data.column);
-            cards = JSON.parse(data.card)
+            cards = JSON.parse(data.card);
             add_popped_url=$('#list-form').data('url');
             archived_popped_url = $('#hidden-column-archive-values').val();
             update_popped_url = $('#hidden-column-update-values').val();
@@ -282,6 +435,7 @@ $(document).ready(function() {
         }
 
 
+        // Ajax Calls
         $(document).on('submit','#list-form', function(e){
             e.preventDefault()
             var title = $('#add-list').val()
@@ -295,12 +449,23 @@ $(document).ready(function() {
             };
         });
 
+
+        $(document).on("click", '.card-reactor', function(){
+            // Loading card values to modal
+            card_id = $(this).data('card_id');
+            data = {
+              card_id : card_id
+            }
+             var url = $(this).data('action');
+             $.get(url,data,reload_card,'json'), function(err){
+
+            };
+        });
+
         $(document).on('submit','.existing-form', function(e){
             e.preventDefault()
             id=$(this).data('value');
             var title = $('#exist-list-' + id).val();
-
-            console.log(title);
             data = {
                 title : title,
                 id : id
@@ -316,6 +481,12 @@ $(document).ready(function() {
             };
         });
 
+        $(document).on("input", "#input-card-title", function(){
+          
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
+
+            };
+        });
 
         $(document).on('submit','#archive-form', function(e){
             e.preventDefault()

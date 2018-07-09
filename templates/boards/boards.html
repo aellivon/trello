@@ -134,14 +134,12 @@
                     </center>
                     {% for member in board_member %}
                         
-                            {% if member.is_confirmed %}
+                            {% if member.is_confirmed and owner_instance != member.user %}
                             <div class="form-check">
                                 <label class="form-check-label">
                                 <fieldset id="checkArray">
                                     <input name="remove_member" class="form-check-input" type="checkbox" value="{{member.id}}">
                                      {{ member.user.email }}   
-                                     
-
                                 </fieldset>
                                 </label>
                             </div>
@@ -198,6 +196,7 @@
             </div>
           </div>
         </div>
+
     <!-- Message Box Modal Alert -->
     {% if message_box %}
         <div class="modal fade modal-fixed" id="MessageBoxModalAlert" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -298,12 +297,12 @@
       </div>
     </div>
 
-    <!-- Invite Member Modal -->
+    <!-- Due Date Modal -->
     <div class="modal fade modal-fixed" id="DueDateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Invite Member</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Set Due Date</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -318,84 +317,143 @@
                 </div>
 
               <div class="modal-footer">
-                <button name="DueDateModal" type="submit" class="btn btn-primary">Invite</button>
+                <button name="DueDateModal" type="submit" class="btn btn-primary">Set Date</button>
               </div>
         </form>
         </div>
       </div>
     </div>
-     <!-- card modal-->
-     <!-- Large modal -->
-    <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-           <div class="modal-content">
+
+  <!-- archive confirmation modal -->
+     <div class="modal fade modal-fixed" id="ArchiveCardConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
               <div class="modal-header">
-
-                <h3 id="heading-card-title" class="modal-title card-class-title" id="exampleModalLabel"><strong>Card Title</strong></h3>
-                 <input id="input-card-title" class="form-control card-class-title display-none" value="Card Title"> 
-
+                <h5 class="modal-title" id="ArchiveCardConfirmationTitle"> Archive Card</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
-
               </div>
-              <div class="modal-body">
-                 <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
-                      <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>
+                  {% csrf_token %}
 
-               </div>
-                <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">
-                      <h5 class="modal-label-manage" id="exampleModalLabel">Manage</h5>
-               </div>
-                 <div class="left-portion-of-modal col-lg-9 col-md-9 col-sm-9">
+                  <div id="" class="modal-body">
+                    Do you want to archive this card?
+                    </div>
 
-                    <textarea readonly id="text-class-description" class="textarea class-description" placeholder="Card Description"></textarea>
-
-                    <button name="" id="card-button-add-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
-                    <button name="" id="card-button-cancel-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>
+                  <div class="modal-footer">
+                    <button id="archive-card-confirmation" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
                   </div>
-
-                  <div class="right-portion-of-modal col-lg-3 col-md-3 col-sm-3">
-                      <button data-toggle="modal" data-target="#CardMemberModal"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>
-                      <button data-toggle="modal" data-target="#DueDateModal" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>
-                      <button name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Archive</button>
-
-                  </div>
-                  <!-- Bottom Part -->
-                  <div id="hr-after-description"class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
-                    <hr class="hr">
-                </div>
-                <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
-                      <h5 class="modal-card-add-comment" id="exampleModalLabel">Add Comment</h5>
-                      <textarea id="text-comment-area" class="textarea" placeholder="Write a comment"></textarea>
-                      <button id="card-button-add-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>
-                       <button id="card-button-cancel-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Cancel</button>
-
-               </div>
-               <!-- Comments -->
-               <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
-                    <hr class="hr">
-                </div>
-                <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
-                      <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>
-               </div>
-               <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
-                    <hr class="hr">
-                </div>
-                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
-
-                      <p class="card-comment-user" id="exampleModalLabel"><strong>Card User</strong> (4 hours ago)</p>
-                      
-                      <div class="card-comments" name="" novalidate="">
-                          Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
-                      </div>
-                      <a class="float-left additional-option-comment">Edit</a> <a class="float-left additional-option-comment">Delete</a>
-                  </div>
-                
-                 </div>
+          
             </div>
+          </div>
+        </div>
+
+
+  <!-- delete comment modal -->
+     <div class="modal fade modal-fixed" id="DeleteCommentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ArchiveCardConfirmationTitle"> Delete Comment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                  
+                  <div id="" class="modal-body">
+                   Are you sure you want to delete this comment?
+                    </div>
+
+                  <div class="modal-footer">
+                    <button id="" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  </div>
+          
+            </div>
+          </div>
+        </div>
+
+     <!-- card modal-->
+     <!-- Large modal -->
+    <div class="class-details-reactor">
+      <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+             <div class="modal-content">
+                <div class="modal-header">
+
+                  <h3 id="heading-card-title" data-action="" class="modal-title card-class-title" id="exampleModalLabel"><strong>Card Title</strong></h3>
+                   <input id="input-card-title" class="form-control card-class-title display-none" value="Card Title"> 
+
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+
+                </div>
+                <div class="modal-body">
+                   <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                        <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>
+
+                 </div>
+                  <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">
+                        <h5 class="modal-label-manage" id="exampleModalLabel">Manage</h5>
+                 </div>
+                   <div class="left-portion-of-modal col-lg-9 col-md-9 col-sm-9">
+
+                      <textarea readonly id="text-class-description" class="textarea class-description" placeholder="Card Description"></textarea>
+
+                      <button name="" id="card-button-add-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
+                      <button name="" id="card-button-cancel-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>
+                    </div>
+
+                    <div class="right-portion-of-modal col-lg-3 col-md-3 col-sm-3">
+                        <button data-toggle="modal" data-target="#CardMemberModal"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>
+                        <button data-toggle="modal" data-target="#DueDateModal" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>
+                        <button  data-toggle="modal" data-target="#ArchiveCardConfirmation"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Archive</button>
+
+                    </div>
+                    <!-- Bottom Part -->
+                    <div id="hr-after-description"class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                      <hr class="hr">
+                  </div>
+                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                        <h5 class="modal-card-add-comment" id="exampleModalLabel">Add Comment</h5>
+                        <textarea id="text-comment-area" class="textarea" placeholder="Write a comment"></textarea>
+                        <button id="card-button-add-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>
+                         <button id="card-button-cancel-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Cancel</button>
+
+                 </div>
+                 <!-- Comments -->
+                 <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                      <hr class="hr">
+                  </div>
+                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                        <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>
+                 </div>
+                 <!-- To Loop -->
+                 <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                      <hr class="hr">
+                  </div>
+                    <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+
+                        <p class="card-comment-user" id="exampleModalLabel"><strong>Card User</strong> (4 hours ago)</p>
+                        
+                        <div  id="DivisionComment" class="card-comments" name="" novalidate="">Ganyan Noon</div>
+                        <textarea id="InputComment" class="textarea card-comments display-none">Ganyan Noon</textarea>
+
+                        <button id="EditComment" class="float-left additional-option-comment link-style btn btn-warning" data-value="id_number">Edit</button>
+                        <button data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment" name="" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>
+                      <button name="" id="card-save-button" class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
+                      <button name="" id="card-cancel-button"class="btn btn-secondary card-button-add-description mr-2 mt-1 float-right display-none">Cancel</button>
+                    </div>
+                 
+                          
+                  <!-- Too Loop? -->
+                   </div>
+              </div>
+        </div>
       </div>
-    </div>
+  </div>
     <!-- Design for page elements -->
     <div class="row custom-row">
         <div class="col-lg-8 col-md-6 col-sm-5 col-xs-5 ">
@@ -442,9 +500,6 @@
     </div>
     <!--  Board Dynamic Design Stuff -->
     <div class ="outer-wrap">
-         
-
-    
         <div class="inner-wrap">
             {% for column in columns %}
             <div class="floatbox">
@@ -466,7 +521,7 @@
                    
                 {% for card in cards %}
                     {% if card.column == column %}
-                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor " data-toggle="modal" data-target="#CardModal" data-value="{{ column.id }}">
+                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
                         <center>
                         <label data-value="{{ column.id }}" class=" form-control card-column-class non-editable-add-card">{{card.name}}</label>
                         </center>

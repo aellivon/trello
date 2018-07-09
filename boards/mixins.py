@@ -7,6 +7,9 @@ from django.core import serializers
 
 
 class AJAXBoardMixIn():
+    """
+        for returning the necessary data to refresh the board
+    """
     def return_board(self):
         board_id = self.kwargs.get('id')
         all_columns = Column.objects.filter(

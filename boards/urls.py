@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (IndexView, BoardView, UserValidationView,
- AddColumnView, UpdateColumnView, ArchiveColumnView, AddCardView)
+ AddColumnView, UpdateColumnView, ArchiveColumnView, AddCardView, GetCardDetails,
+ UpdateCardTitle)
 
 
 app_name = 'boards'
@@ -13,4 +14,6 @@ urlpatterns = [
      path('update/board/<int:id>', UpdateColumnView.as_view(),  name="update_column"),
      path('archive/board/<int:id>', ArchiveColumnView.as_view(),  name="archive_column"),
      path('add/card/<int:id>', AddCardView.as_view(),  name="add_card"),
+     path('get/card/<int:id>', GetCardDetails.as_view(),  name="get_card_detail"),
+     path('update/card_title', UpdateCardTitle.as_view(), name="update_card_title")
 ]

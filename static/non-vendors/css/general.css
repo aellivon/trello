@@ -117,8 +117,9 @@ body {
 }
 
 .additional-option-comment{
-    padding-right: 10px;
-    padding-top: 10px;
+    background-color: transparent;
+    margin-right: 10px;
+    margin-top: 10px;
 }
 
 .card-comment-time-user{
@@ -178,9 +179,9 @@ body {
 
 
 .card-comments{
-    min-height:100px;
+    min-height:20px;
     max-height: 100px;
-    text-indent: 40px;
+    text-indent: 10px;
     text-align: justify;
     overflow-y: auto;
 }

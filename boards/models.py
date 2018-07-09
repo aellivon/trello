@@ -52,12 +52,21 @@ class Card(models.Model):
     due_date = models.DateTimeField(null=True)
     archived = models.BooleanField(default=False)
 
+    def __str__(self):
+        return "{}".format(self.name)
+
 class CardMember(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return "{}-{}".format(self.card.name,self.user)
 
 class CardComment(models.Model):
     user =models.ForeignKey(User,on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
     comment = models.TextField()
     date_commented = models.DateTimeField(auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return "{}-{}".format(self.user, self.comment)
