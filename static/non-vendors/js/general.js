@@ -54,27 +54,26 @@ $(document).ready(function() {
         })
 
 
-        $(document).on("click", '#EditComment', function(){
-                console.log("hi");
+        $(document).on("click", '.ClassEditComment', function(){
                 card_id=$(this).data('value');
                 console.log(card_id);
                 $('#DivisionComment-'+card_id).addClass('display-none');
                 $('#InputComment-'+card_id).removeClass('display-none');
-                $('#EditComment').addClass('display-none');
-                $('#DeleteComment').addClass('display-none');
-                $("#card-save-button").removeClass('display-none');
-                $("#card-cancel-button").removeClass('display-none');
+                $('#EditComment-'+card_id).addClass('display-none');
+                $('#DeleteComment-'+card_id).addClass('display-none');
+                $("#card-save-button-"+card_id).removeClass('display-none');
+                $("#card-cancel-button-"+card_id).removeClass('display-none');
         })
 
-         $(document).on("click", '#card-cancel-button', function(){
+         $(document).on("click", '.class-card-cancel-button', function(){
                 card_id=$(this).data('value');
                 console.log(card_id);
                 $('#DivisionComment-'+card_id).removeClass('display-none');
                 $('#InputComment-'+card_id).addClass('display-none');
-                $('#EditComment').removeClass('display-none');
-                $('#DeleteComment').removeClass('display-none');
-                $("#card-save-button").addClass('display-none');
-                $("#card-cancel-button").addClass('display-none');
+                $('#EditComment-'+card_id).removeClass('display-none');
+                $('#DeleteComment-'+card_id).removeClass('display-none');
+                $("#card-save-button-"+card_id).addClass('display-none');
+                $("#card-cancel-button-"+card_id).addClass('display-none');
         })
 
 
@@ -135,7 +134,6 @@ $(document).ready(function() {
 
         $(document).on("click", '.title-card-class', function(){
             value = $(this).data('value');
-            console.log(value);
             $(".add-card-reactor-"+value).hide();
             $("#card-add-form-column-"+value).show();
             $( "#add-card-reactor-"+value+" > input" ).focus();
@@ -143,7 +141,6 @@ $(document).ready(function() {
 
         $(document).on("click", '#close-add-card', function(){
             value = $(this).data('value');
-            console.log(value);
             $("#card-add-form-column-"+value).hide();
             $(".add-card-reactor-"+value).show();
         });
@@ -163,17 +160,17 @@ $(document).ready(function() {
         });
 
         // Decsription Animation
-        $(document).on("dblclick", "#text-class-description", function(){
-            if($('#text-class-description').prop('readonly')){
+        $(document).on("dblclick", "#text-id-description", function(){
+            if($('#text-id-description').prop('readonly')){
 
-               $('#text-class-description').attr("readonly",false);
+               $('#text-id-description').attr("readonly",false);
                $("#card-button-add-description").removeClass('display-none');
                $("#card-button-cancel-description").removeClass('display-none');
                $( "#hr-after-description" ).addClass( "mt-4" );
             }
         });
         $(document).on("click", "#card-button-cancel-description", function(){
-          $('#text-class-description').attr("readonly",true);
+          $('#text-id-description').attr("readonly",true);
           $("#card-button-add-description").addClass('display-none');
           $("#card-button-cancel-description").addClass('display-none');
           $( "#hr-after-description" ).removeClass( "mt-4" );
@@ -219,25 +216,249 @@ $(document).ready(function() {
                     minuteFormatted + morning;
         }
 
+
+
+        // Ajax Calls
+        $(document).on('submit','#list-form', function(e){
+            e.preventDefault()
+            var title = $('#add-list').val()
+            data = {
+                title : title
+            }
+            var url = $(this).attr('action');
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
+
+            };
+        });
+
+
+
+        $(document).on('submit','.existing-form', function(e){
+            e.preventDefault();
+            id=$(this).data('value');
+            var title = $('#exist-list-' + id).val();
+            data = {
+                title : title,
+                id : id
+            }
+            var url = $(this).attr('action');
+
+            if (url == undefined){
+                url = $('#hidden-column-update-values').val();
+            }
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
+
+            };
+        });
+
+
+        $(document).on('submit','#archive-form', function(e){
+            e.preventDefault()
+            id=$(this).data('value');
+
+            data = {
+                id : id
+            }
+            var url = $(this).attr('action');
+
+            if (url == undefined){
+                url = $('#hidden-column-archive-values').val();
+            }
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
+
+            };
+        });
+
+
+        $(document).on('submit','.card-add-form-class', function(e){
+            e.preventDefault()
+            id=$(this).data('value');
+            name = $("#add-card-"+id).val();
+            data = {
+                name : name,
+                id : id
+            }
+            var url = $('.card-add-form-class').attr('action');
+            if (url == undefined){
+                url = $('#hidden-card-add-values').val();
+            }
+                
+            $.post(url,data,reload_inner_wrapper,'json'), function(err){
+                console.log('error');
+            };
+        });
+
+        // Card Ajax
+        $(document).on("click", '.card-reactor', function(){
+            // Loading card values to modal
+            card_id = $(this).data('card_id');
+            data = {
+              card_id : card_id
+            }
+
+            console.log(card_id);
+             var url = $('#hidden-get-card-action').data('url');
+             console.log(url);
+             $.get(url,data,reload_card,'json') .fail(function(err){
+                console.log(err);
+             })
+
+        });
+
+        // Changing text card title action
+        $(document).on("input", "#input-card-title", function(){
+            url=$('#heading-card-title').attr('action');
+            id =$('#heading-card-title').data('card_id');
+            var title=$('#input-card-title').val();
+            if (title){
+                data = {
+                    title : title,
+                    card_id : id
+                }
+
+                $.post(url,data,reload_card_title,'json'), function(err){
+                    console.log("error");
+                };
+            }
+        });
+
+
+        // Saving changes for card description
+        $(document).on("click", "#card-button-add-description", function(){
+            $('#text-id-description').attr("readonly",true);
+            $("#card-button-add-description").addClass('display-none');
+            $("#card-button-cancel-description").addClass('display-none');
+            $( "#hr-after-description" ).removeClass( "mt-4" );
+            var id = $('#heading-card-title').data('card_id');
+            var description=$('#text-id-description').val();
+            var url=$('#hidden-column-update-description').data('url');
+            data = {
+                description : description,
+                card_id : id
+            }
+            $.post(url,data,null,'text'), function(err){
+            };
+        });
+
+ 
+
+        function get_board(){
+            url=$("#hidden-column-get-board").data('url')
+            $.get(url,null,reload_inner_wrapper,'json'), function(err){
+                console.log("error");
+            };
+        }
+
+
+
+        // Html population Region
+        reload_card_title = function(data){
+           $('.reload-title').empty();
+           cards = JSON.parse(data.cards);
+           html = cards[0].fields.name;
+           $(".reload-title").append(html);
+           get_board();
+
+        }
+
+        // Adding Comment
+        $(document).on("click","#card-button-add-comment", function(){
+            $("#card-button-add-comment").addClass('display-none');
+            $("#card-button-cancel-comment").addClass('display-none');
+
+            url=$('#hidden-comment-add').data('url');
+            id =$('#heading-card-title').data('card_id');
+
+            var comment=$('#text-comment-area').val();
+            data = {
+                comment : comment,
+                card_id : id
+            }
+            $.post(url, data, reload_comments,'json') 
+            .fail(function() {
+                console.log("error");
+             })
+
+        });
+
+        reload_comments = function(data){
+            $('.comment-reactor').empty();
+            comments = JSON.parse(data.comments);
+
+            console.log(comments);
+
+            html = "";
+            if(comments){
+                html += '<!-- Comments -->'
+                 +'      <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">'
+                 +'           <hr class="hr">'
+                +'       </div>'
+                 +'      <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
+                 +'            <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>'
+                 +'     </div>';
+                 console.log('sulod');
+            }
+                    
+            index = 0;
+            while(index < comments.length){
+                date_commented = new Date(comments[index].fields.date_commented);
+                date_commented = formatDate(date_commented);
+                html +='      <!-- To Loop -->'
+                     +'       <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">'
+                     +'            <hr class="hr">'
+                     +'       </div>'
+                     +'         <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
+
+                     +'             <p class="card-comment-user" id="exampleModalLabel"><strong>'+comments[index].fields.user+'</strong> ('+date_commented+')</p>'
+                     +'             '
+                     +'             <div  id="DivisionComment-'+comments[index].pk+'" class="card-comments" name="" novalidate="">'+comments[index].fields.comment+'</div>'
+                     +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none">'+comments[index].fields.comment+'</textarea>'
+
+
+                    if(user.current_user==comments[index].fields.user){
+                         html+='             <button data-value="'+comments[index].pk+'" id="EditComment-'+comments[index].pk+'" class="ClassEditComment float-left additional-option-comment link-style btn btn-warning">Edit</button>'
+                         +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment-'+comments[index].pk+'" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
+                         +'           <button data-value="'+comments[index].pk+'" name="" id="card-save-button-'+comments[index].pk+'" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>'
+                         +'           <button data-value="'+comments[index].pk+'" name="" id="card-cancel-button-'+comments[index].pk+'" class="class-card-cancel-button btn btn-secondary card-button-add-comment mr-2 mt-1 float-right display-none">Cancel</button>'
+                    }
+                  html+='         </div>'
+                    +'      '
+                    +'       '
+                    +'      <!-- Too Loop? -->';
+             
+                            index+=1;
+                             console.log('sulod');
+               }
+             console.log('hi');
+             $('.comment-reactor').html(html);
+        }
+
         // Reloading the card
         reload_card = function(data){
+            console.log('reloading card...');
+            popped_card_title_link = $('#heading-card-title').attr('action');
             $(".class-details-reactor").empty();
-            console.log(data);
             cards=JSON.parse(data.cards);
-            comments=JSON.parse(data.comments);
+            console.log(data.current_user);
+            user=data.current_user;
+            comments = "";
+            if(data.comments){
+                comments=JSON.parse(data.comments);
+            }
+           
+            card_id = cards[0].pk;
             card_name = cards[0].fields.name;
             card_description = cards[0].fields.description;
             if (card_description==null){
               card_description="";
             }
-            console.log(name);
             html = ""
             html += ' <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">'
                   +'<div class="modal-dialog modal-lg">'
                    +'    <div class="modal-content">'
                    +'       <div class="modal-header">'
 
-                   +'         <h3 id="heading-card-title" class="modal-title card-class-title" id="exampleModalLabel"><strong>'+card_name+'</strong></h3>'
+                   +'         <h3 id="heading-card-title" data-card_id="'+card_id+'" action="'+popped_card_title_link+'" class="modal-title card-class-title"><strong><div class="reload-title">'+card_name+'</div></strong></h3>'
                   +'          <input id="input-card-title" class="form-control card-class-title display-none" value="'+card_name+'"> '
                    +'         <button type="button" class="close" data-dismiss="modal" aria-label="Close">'
                    +'           <span aria-hidden="true">&times;</span>'
@@ -254,7 +475,7 @@ $(document).ready(function() {
                     +'       </div>'
                     +'         <div class="left-portion-of-modal col-lg-9 col-md-9 col-sm-9">'
 
-                    +'            <textarea readonly id="text-class-description" class="textarea class-description" placeholder="Card Description">'+card_description+'</textarea>'
+                    +'            <textarea readonly id="text-id-description" class="textarea class-description" placeholder="Card Description">'+card_description+'</textarea>'
 
                      +'           <button name="" id="card-button-add-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>'
                     +'            <button name="" id="card-button-cancel-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>'
@@ -276,9 +497,10 @@ $(document).ready(function() {
                       +'            <button id="card-button-add-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>'
                      +'              <button id="card-button-cancel-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Cancel</button>'
 
-                     +'      </div>';
+                     +'      </div>'
+                     +'<div class="comment-reactor"> ';
                      if(comments){
-                            html += '      <!-- Comments -->'
+                            html += '     <!-- Comments -->'
                          +'      <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">'
                          +'           <hr class="hr">'
                          +'       </div>'
@@ -300,21 +522,24 @@ $(document).ready(function() {
                              +'             <p class="card-comment-user" id="exampleModalLabel"><strong>'+comments[index].fields.user+'</strong> ('+date_commented+')</p>'
                              +'             '
                              +'             <div  id="DivisionComment-'+comments[index].pk+'" class="card-comments" name="" novalidate="">'+comments[index].fields.comment+'</div>'
-                             +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none">'+comments[index].fields.comment+'</textarea>'
+                             +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none">'+comments[index].fields.comment+'</textarea>';
 
-                             +'             <button data-value="'+comments[index].pk+'" id="EditComment" class="float-left additional-option-comment link-style btn btn-warning">Edit</button>'
-                             +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
-                             +'           <button data-value="'+comments[index].pk+'" name="" id="card-save-button" class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>'
-                             +'           <button data-value="'+comments[index].pk+'" name="" id="card-cancel-button"class="btn btn-secondary card-button-add-description mr-2 mt-1 float-right display-none">Cancel</button>'
-                             +'         </div>'
+                             if(user.current_user==comments[index].fields.user){
+                                 html+='             <button data-value="'+comments[index].pk+'" id="EditComment-'+comments[index].pk+'" class="ClassEditComment float-left additional-option-comment link-style btn btn-warning">Edit</button>'
+                                +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment-'+comments[index].pk+'" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
+                                +'           <button data-value="'+comments[index].pk+'" name="" id="card-save-button-'+comments[index].pk+'" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>'
+                                +'           <button data-value="'+comments[index].pk+'" name="" id="card-cancel-button-'+comments[index].pk+'" class="class-card-cancel-button btn btn-secondary card-button-add-comment mr-2 mt-1 float-right display-none">Cancel</button>'
+                             }
+                             html+='         </div>'
                              +'      '
-                             +'               '
+                             +'       '
                               +'      <!-- Too Loop? -->';
              
                             index+=1;
                       }
                       html+=' </div>'
                             +'    </div>'
+                            +'  </div>'
                             +'  </div>';
              $(".class-details-reactor").html(html);
              $("#CardModal").modal('show');
@@ -363,20 +588,13 @@ $(document).ready(function() {
                              b = 0;
                              while(b < cards.length){
                                 if (cards[b].fields.column == columns[a].pk){
-                                    html+= '<div id="existing-card-'+column_id+'"'
-                                      +' class="card-reactor" data-toggle="modal" data-target="#CardModal"'
-                                      +' data-value="'+column_id+'">'
-                                      + '           <center>'
-                                      + '           <label data-value="'+column_id+'"'
-                                      +' class=" form-control card-column-class'
-                                      +' non-editable-add-card">'+cards[b].fields.name+'</label>'
-                                      + '           </center>'
-                                      + '           <form id="archive-form"'
-                                      +' action=""'
-                                      +' data-url=""'
-                                      + ' data-value="'+column_id+'" novalidate="">'
-                                      + '         </form>'
-                                      + '       </div>';
+                                    html+= '<div id="existing-card-'+column_id+'" data-card_id='+cards[b].pk+' class="card-reactor" data-value="'+column_id+'">'
+                                        +' <center>'
+                                        +' <label data-value="'+column_id+'" class=" form-control card-column-class non-editable-add-card">'+cards[b].fields.name+'</label>'
+                                        +' </center>'
+                                        +'  <form id="archive-form" action="'+archived_popped_url+'" data-url="'+archived_popped_url+'" data-value="'+column_id+'" novalidate="">'
+                                        +'  </form>'
+                                        +' </div>'
                                 }
                                 b+=1;
                              }
@@ -387,7 +605,7 @@ $(document).ready(function() {
                                       + ' data-url="">'
                                       + ' <input id="exist-list-'+column_id+'"'
                                       + ' class="form-control title-column-class"'
-                                      + 'data-value="'+column_id+'" value="'+column_name+'"> '
+                                      + 'data-value="'+column_id+'" value="'+column_id+'"> '
                                       + ' <button name="AddColumn" type="submit"'
                                       + 'class="btn btn-success btn-add-list">Update</button>' 
                                       + '<button id="close-add-list" type="button" class="btn'
@@ -433,100 +651,6 @@ $(document).ready(function() {
               +'</div>';
             $('.inner-wrap').html(html);
         }
-
-
-        // Ajax Calls
-        $(document).on('submit','#list-form', function(e){
-            e.preventDefault()
-            var title = $('#add-list').val()
-            data = {
-                title : title
-            }
-            var url = $(this).attr('action');
-             console.log(url);
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-
-            };
-        });
-
-
-        $(document).on("click", '.card-reactor', function(){
-            // Loading card values to modal
-            card_id = $(this).data('card_id');
-            data = {
-              card_id : card_id
-            }
-             var url = $(this).data('action');
-             $.get(url,data,reload_card,'json'), function(err){
-
-            };
-        });
-
-        $(document).on('submit','.existing-form', function(e){
-            e.preventDefault()
-            id=$(this).data('value');
-            var title = $('#exist-list-' + id).val();
-            data = {
-                title : title,
-                id : id
-            }
-            var url = $(this).attr('action');
-
-            console.log(url);
-            if (url == undefined){
-                url = $('#hidden-column-update-values').val();
-            }
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-
-            };
-        });
-
-        $(document).on("input", "#input-card-title", function(){
-          
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-
-            };
-        });
-
-        $(document).on('submit','#archive-form', function(e){
-            e.preventDefault()
-            id=$(this).data('value');
-
-            data = {
-                id : id
-            }
-            var url = $(this).attr('action');
-
-            console.log(url);
-            if (url == undefined){
-                url = $('#hidden-column-archive-values').val();
-            }
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-
-            };
-        });
-
-
-        $(document).on('submit','.card-add-form-class', function(e){
-            console.log("hello");
-            e.preventDefault()
-            id=$(this).data('value');
-            console.log($(this).attr('action'));
-            name = $("#add-card-"+id).val();
-            data = {
-                name : name,
-                id : id
-            }
-            var url = $('.card-add-form-class').attr('action');
-            if (url == undefined){
-                url = $('#hidden-card-add-values').val();
-                console.log(url);
-            }
-                
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-                console.log('error');
-            };
-        });
 
         
 });

@@ -5,11 +5,12 @@ from django.views.generic import TemplateView, View
 from .models import Board, BoardMember, Referral, Column, Card, CardComment
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
-from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
+from django.http import (HttpResponse, HttpResponseRedirect,
+    HttpResponseBadRequest, JsonResponse)
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .mixins import AJAXBoardMixIn
+from .mixins import AJAXBoardMixIn, AJAXCardMixIn
 from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
@@ -222,6 +223,13 @@ class BoardView(LoginRequiredMixin, TemplateView):
 
 
 # ajax implementation
+
+class GetBoardDetails(AJAXBoardMixIn, View):
+    
+    def get(self, *args, **kwargs):
+        data = self.return_board()
+        return JsonResponse(data)
+
 class AddColumnView(AJAXBoardMixIn, View):
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
@@ -236,7 +244,8 @@ class AddColumnView(AJAXBoardMixIn, View):
         new_column = Column(board=board,name=title,position=to_add_position)
         new_column.save()
         data = self.return_board()
-        return HttpResponse(data)
+        # needs to be changed
+        return JsonResponse(data)
 
 
 
@@ -249,7 +258,8 @@ class UpdateColumnView(AJAXBoardMixIn, View):
         column.name = title
         column.save()
         data = self.return_board()
-        return HttpResponse(data)
+        # needs to be changed
+        return JsonResponse(data)
 
 
 class ArchiveColumnView(AJAXBoardMixIn, View):
@@ -260,7 +270,8 @@ class ArchiveColumnView(AJAXBoardMixIn, View):
         column.archived = True
         column.save()
         data = self.return_board()
-        return HttpResponse(data)
+        # needs to be changed
+        return JsonResponse(data)
 
 
 class AddCardView(AJAXBoardMixIn, View):
@@ -272,27 +283,45 @@ class AddCardView(AJAXBoardMixIn, View):
         new_card = Card(name=name,column=column)
         new_card.save()
         data = self.return_board()
-        return HttpResponse(data)
+        return JsonResponse(data)
 
-class GetCardDetails(View):
+class GetCardDetails(AJAXCardMixIn, View):
     def get(self, *args, **kwargs):
-        card_id = self.request.GET.get('card_id')
-        # brackets are needed since they are single objects
-        card = [get_object_or_404(Card,pk=card_id)]
-        card_comments = CardComment.objects.filter(card__id=card_id).select_related('user')
-        serialized_data_cards = serializers.serialize('json', card)
-        if card_comments:
-            serialized_data_comments = serializers.serialize('json', card_comments, 
-                use_natural_foreign_keys=True)
-            data = { 'cards' : serialized_data_cards,
-                 'comments' : serialized_data_comments}
-        else:
-            data = { 'cards' : serialized_data_cards}
-        return HttpResponse(simplejson.dumps(data))
+        data=self.return_card()
+        return JsonResponse(data)
 
-class UpdateCardTitle(View):
+class UpdateCardTitle(AJAXCardMixIn, View):
+
     def post(self, *args, **kwargs):
-        print ("hi")
+        name =  self.request.POST.get('title')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        card.name = name
+        card.save()
+        data=self.return_card()
+        return JsonResponse(data)
+
+class UpdateCardDescription(View):
+
+    def post(self, *args, **kwargs):
+        description =  self.request.POST.get('description')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        card.description = description
+        card.save()
+        return HttpResponse('success!')
+
+
+class AddCommentCard(AJAXCardMixIn, View):
+
+    def post(self, *args, **kwargs):
+        comment =  self.request.POST.get('comment')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        new_comment = CardComment(card=card, user=self.request.user, comment=comment)
+        new_comment.save()
+        data=self.return_card()
+        return JsonResponse(data)
 
 
 

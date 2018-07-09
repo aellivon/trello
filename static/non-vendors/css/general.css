@@ -15,6 +15,7 @@ body {
   display:flex;
 }
 
+
 .textarea {
   padding: 10px;
   resize: none;
@@ -115,6 +116,7 @@ body {
 .card-comment-user{
     font-size: 17px;
 }
+
 
 .additional-option-comment{
     background-color: transparent;
