@@ -440,6 +440,7 @@ hr.border{
     float:left;
     margin-right:-999em;
     padding-left:20px;
+    height: 100%;
 }
 .floatbox {
     float:left; /*force into block level for dimensions*/

@@ -52,14 +52,14 @@ class AJAXCardMixIn():
 
 class BoardPermissionMixIn():
     """
-        board permission mix in
+        Get if the one accessing the url is a board member.
+        If not board member, throw bad request.
     """
     def dispatch(self, request, *args, **kwargs):
         board_id = self.kwargs.get('id')
-        user_id = self.request.user.id
         # Permission Denied if 404
         exists = get_object_or_None(
-            BoardMember, board__id=board_id,user__pk= user_id)
+            BoardMember, board__id=board_id,user__pk=self.request.user.id)
         if not exists:
             return HttpResponseBadRequest()
 

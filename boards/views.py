@@ -64,6 +64,10 @@ class IndexView(LoginRequiredMixin,TemplateView):
 
 
 class BoardView(LoginRequiredMixin, TemplateView):
+    """
+        Handling the upper part of the board and initialization of 
+        the board itself.
+    """
     # Reverse lazy is needed since this code is before the Url coniguration
     # is loaded
     login_url = reverse_lazy('users:log_in')
@@ -233,14 +237,18 @@ class BoardView(LoginRequiredMixin, TemplateView):
 # ajax implementation
 
 class GetBoardDetails(LoginRequiredMixin, BoardPermissionMixIn , AJAXBoardMixIn, View):
-
+    """
+        This class simply refreshes the board itself
+    """
     login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         data = self.return_board()
         return JsonResponse(data)
 
 class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
-
+    """
+        This class adds a column in the board and refreshses the board itself.
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
@@ -261,7 +269,9 @@ class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vi
 
 
 class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
-
+    """
+        This class updates the column name and refreshes the board itself
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
@@ -275,7 +285,9 @@ class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn,
 
 
 class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
-
+    """
+        This class archives the column and refreshes the board itself
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         to_update_id = self.request.POST.get('id')
@@ -288,7 +300,10 @@ class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn
 
 
 class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
-
+    """
+        This class adds a card and refreshes the board itself to reflect
+        those changes
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         name = self.request.POST.get('name')
@@ -300,14 +315,18 @@ class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View
         return JsonResponse(data)
 
 class GetCardDetails(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
-
+    """
+        This class reloads the card modal.
+    """
     login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         data=self.return_card()
         return JsonResponse(data)
 
 class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
-
+    """
+        This class updates the card title and reloads the card modal
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         name =  self.request.POST.get('title')
@@ -319,7 +338,9 @@ class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, V
         return JsonResponse(data)
 
 class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
-
+    """
+        This class updates the card description and reloads the card modal
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         description =  self.request.POST.get('description')
@@ -332,7 +353,10 @@ class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
 
 
 class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
-
+    """
+        This class adds a comment to the card and refreshes the comment section
+        of the modal
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         comment =  self.request.POST.get('comment')
@@ -345,7 +369,10 @@ class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vi
         return JsonResponse(data)
 
 class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
-
+    """
+        This class deletes a comment and refreshes the comment section of the 
+        modal
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         comment_id = self.request.POST.get('comment_id')
@@ -354,7 +381,9 @@ class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
         return JsonResponse(data)
 
 class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
-
+    """
+        This class assigns members to a card. 
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         selected = self.request.POST.getlist('selected[]')
@@ -374,7 +403,9 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
         return JsonResponse(data)
 
 class GetMembers(LoginRequiredMixin, BoardPermissionMixIn, View):
-
+    """
+        This class fetches all the members for further use
+    """
     login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         card_id = self.request.GET.get('card_id')
@@ -385,7 +416,12 @@ class GetMembers(LoginRequiredMixin, BoardPermissionMixIn, View):
         return JsonResponse(data)
 
 class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
-
+    """
+        GET: This class gets the due date of a card when get request is called.
+        
+        POST: When post request is called, it updates the due date value
+            of the value itself.
+    """
     login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         card_id = self.request.GET.get('card_id')
@@ -407,7 +443,9 @@ class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
         return HttpResponse('success!')
 
 class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
-
+    """
+        This class archives the card that is currently selected.
+    """
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         print('hi')

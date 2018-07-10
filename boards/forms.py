@@ -10,8 +10,9 @@ from django.contrib.auth import logout, authenticate, login
 from django.core.mail import send_mail
 
 class BoardModalForm(forms.Form):
-
-
+    """
+        This class is for handling board name forms and action
+    """
 
     board_name = forms.CharField(max_length=30,
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
@@ -30,6 +31,9 @@ class BoardModalForm(forms.Form):
         board.save()
 
 class MembersModalForm(forms.Form):
+    """
+        This class is for handlong member forms, cleaning, and actions
+    """
 
     def __init__(self, *args, **kwargs):
         # This would allow the passing of variables to the clean method
@@ -71,8 +75,10 @@ class MembersModalForm(forms.Form):
 
     def remove_members(self, to_remove):
         # removing members from a board
-        for id in to_remove:
-            BoardMember.objects.filter(pk=id).delete()
+        members=BoardMember.objects.filter(id__in=to_remove)
+        for member in members:
+            member.delete()
+            
 
     def remove_member(self, user_id, board):
         BoardMember.objects.get(user__id=user_id, board=board).delete()
@@ -96,6 +102,10 @@ class MembersModalForm(forms.Form):
 
 
 class UserValidationForm(forms.Form):
+    """
+        This class if for handling the user validation form, cleaning,
+         and  actions
+    """
     username = forms.CharField(max_length=20,
         required=True, widget=forms.TextInput(attrs={'class' : 'form-control sign-up-input'}))
     password = forms.CharField(

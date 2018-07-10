@@ -1,6 +1,7 @@
 
 $(document).ready(function() {
 
+      
         // using jQuery
         function getCookie(name) {
             var cookieValue = null;
@@ -638,7 +639,7 @@ $(document).ready(function() {
                }
              $('.comment-reactor').html(html);
         }
-
+        
         // Reloading the card
         reload_card = function(data){
             console.log('reloading card...');

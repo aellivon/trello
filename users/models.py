@@ -6,6 +6,9 @@ def upload_location(instance, filename):
     return "{}/{}".format(instance.id, filename)
 
 class User(AbstractUser):
+    """
+        Extends the user with a bio field
+    """
     bio = models.TextField(max_length=200,default="")
     
 
