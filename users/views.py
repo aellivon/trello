@@ -59,6 +59,9 @@ class LogInView(ThrowHomeIfLoggedInMixIn,TemplateView):
 
 
 class LogOutView(TemplateView):
+    """
+        This view is for simply logging out the user
+    """
     template_name = "users/log_in.html"
 
     def get(self, *args,** kwargs):

@@ -134,11 +134,26 @@
                     </center>
                     {% for member in board_member %}
                         
+                            {% if member.is_confirmed and owner_instance != member.user %}
                             <div class="form-check">
                                 <label class="form-check-label">
                                 <fieldset id="checkArray">
                                     <input name="remove_member" class="form-check-input" type="checkbox" value="{{member.id}}">
-                                     {{ member.user.email }}  {% if not member.is_confirmed %} (Pending) {% endif %}
+                                     {{ member.user.email }}   
+                                </fieldset>
+                                </label>
+                            </div>
+                            {% endif %}
+                    {% endfor %}
+                    {% for member in referral %}
+                        
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                <fieldset id="checkArray">
+                                    <input name="remove_member" class="form-check-input" type="checkbox" value="{{member.board_member.id}}">
+                                    {% if not member.is_confirmed %}
+                                     {{ member.email }} (Pending)   
+                                     {% endif %}
 
                                 </fieldset>
                                 </label>
@@ -153,6 +168,35 @@
       </div>
     </div>
     </form>
+       
+    <!-- leaving confirmation modal -->
+     <div class="modal fade modal-fixed" id="LeaveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                  <form name="LeaveConfirmationModal" method="post" novalidate="">
+
+                  {% csrf_token %}
+
+                  <div class="modal-body">
+                        Are you sure you want to leave this group?
+                    </div>
+
+                  <div class="modal-footer">
+                    <button name="LeaveConfirmationModal" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  </div>
+                  </form>
+          
+            </div>
+          </div>
+        </div>
+
     <!-- Message Box Modal Alert -->
     {% if message_box %}
         <div class="modal fade modal-fixed" id="MessageBoxModalAlert" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -184,6 +228,232 @@
         </div>
 
     {% endif %}
+
+
+            <!-- Inner Confirmation Modal -->
+        <div class="modal fade modal-fixed" id="RemoveConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+                  <div class="modal-body">
+                        Are you sure you want to remove these?
+                    </div>
+
+                  <div class="modal-footer">
+                    <button name="RemoveMemberModal" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+
+                  </div>
+          
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Member Modal -->
+    <div class="modal fade modal-fixed" id="CardMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Assigning Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+                                
+
+              <div class="modal-body">
+                    <center>
+                    <div id = "reactor">
+                    </div>
+                    </center>
+                    {% for member in board_member %}
+                        
+                            {% if member.is_confirmed %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                <fieldset id="checkArray">
+                                  <div class="assign-division">
+                                    <input name="remove_member" id="assign-checkbox-{{member.user.id}}" class="form-check-input" type="checkbox" value="{{member.user.id}}">
+                                     {{ member.user.email }}   
+                                   </div>
+                                </fieldset>
+                                </label>
+                            </div>
+                            {% endif %}
+                    {% endfor %}
+                </div>
+              <div class="modal-footer">
+                  <span id="btnAssignRemove" data-action="{% url 'boards:assign_members' id=board.id %}"> <button type="button" class="btn btn-secondary" >Assign</button></span>
+                  <span id="btnAssignCancel"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button></span>
+              </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Due Date Modal -->
+    <div class="modal fade modal-fixed" id="DueDateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Set Due Date</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+                                
+          <form name="DueDateModal" method="post" novalidate="">
+            {% csrf_token %}
+
+              <div class="modal-body">
+                    <label for="" class="label-margin">Due Date</label>
+                    <input id="input-due-date" type="datetime-local">
+                </div>
+
+              <div class="modal-footer">
+                <button id="set-due-date" type="submit" class="btn btn-primary">Set Date</button>
+              </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
+  <!-- archive confirmation modal -->
+     <div class="modal fade modal-fixed" id="ArchiveCardConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ArchiveCardConfirmationTitle"> Archive Card</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                  {% csrf_token %}
+
+                  <div id="" class="modal-body">
+                    Do you want to archive this card?
+                    </div>
+
+                  <div class="modal-footer">
+                    <button id="archive-card-confirmation" data-url="{% url 'boards:archive_card' id=board.id %}" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  </div>
+          
+            </div>
+          </div>
+        </div>
+
+
+  <!-- delete comment modal -->
+     <div class="modal fade modal-fixed" id="DeleteCommentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ArchiveCardConfirmationTitle"> Delete Comment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+                  
+                  <div id="" class="modal-body">
+                   Are you sure you want to delete this comment?
+                    </div>
+
+                  <div class="modal-footer">
+                    <button id="delete-comment-yes" data-url="{% url 'boards:delete_comment' id=board.id %}" data-to_remove="0" type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  </div>
+          
+            </div>
+          </div>
+        </div>
+
+     <!-- card modal-->
+     <!-- Large modal -->
+    <div class="class-details-reactor">
+      <div class="modal fade bd-example-modal-lg" id="CardModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+             <div class="modal-content">
+                <div class="modal-header">
+
+                  <h3 id="heading-card-title" action="{% url 'boards:update_card_title' id=board.id %}" data-value="card_id" class="modal-title card-class-title"><strong><div class="reload-title">Card Title</div></strong></h3>
+                   <input id="input-card-title" class="form-control card-class-title display-none" value="Card Title"> 
+
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+
+                </div>
+                <div class="modal-body">
+                   <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                        <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>
+
+                 </div>
+                  <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">
+                        <h5 class="modal-label-manage" id="exampleModalLabel">Manage</h5>
+                 </div>
+                   <div class="left-portion-of-modal col-lg-9 col-md-9 col-sm-9">
+
+                      <textarea readonly id="text-id-description" class="textarea class-description" placeholder="Card Description"></textarea>
+
+                      <button name="" id="card-button-add-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
+                      <button name="" id="card-button-cancel-description"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>
+                    </div>
+
+                    <div class="right-portion-of-modal col-lg-3 col-md-3 col-sm-3">
+                        <button data-toggle="modal" data-target="#CardMemberModal"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>
+                        <button data-toggle="modal" data-target="#DueDateModal" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>
+                        <button  data-toggle="modal" data-target="#ArchiveCardConfirmation"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Archive</button>
+
+                    </div>
+                    <!-- Bottom Part -->
+                    <div id="hr-after-description"class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                      <hr class="hr">
+                  </div>
+                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                        <h5 class="modal-card-add-comment" id="exampleModalLabel">Add Comment</h5>
+                        <textarea id="text-comment-area" class="textarea" placeholder="Write a comment"></textarea>
+                        <button id="card-button-add-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>
+                         <button id="card-button-cancel-comment" name="" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Cancel</button>
+
+                 </div>
+                 <div class="comment-reactor">
+                 <!-- Comments -->
+                 <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                      <hr class="hr">
+                  </div>
+                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                        <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>
+                 </div>
+                 <!-- To Loop -->
+                 <div class="left-portion-of-header col-lg-12 col-md-12 col-sm-12">
+                      <hr class="hr">
+                  </div>
+                    <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+
+                        <p class="card-comment-user" id="exampleModalLabel"><strong>Card User</strong> (4 hours ago)</p>
+                        
+                        <div  id="DivisionComment" class="card-comments" name="" novalidate="">Ganyan Noon</div>
+                        <textarea id="InputComment" class="textarea card-comments display-none">Ganyan Noon</textarea>
+
+                        <button id="EditComment" class="float-left additional-option-comment link-style btn btn-warning" data-value="id_number">Edit</button>
+                        <button data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment" name="" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>
+                      <button name="" id="card-save-button" class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
+                      <button name="" id="card-cancel-button"class="btn btn-secondary card-button-add-description mr-2 mt-1 float-right display-none">Cancel</button>
+                    </div>
+                 
+                  <!-- Too Loop? -->
+                   </div>
+              </div>
+        </div>
+      </div>
+    </div>
+  </div>
     <!-- Design for page elements -->
     <div class="row custom-row">
         <div class="col-lg-8 col-md-6 col-sm-5 col-xs-5 ">
@@ -199,12 +469,14 @@
 
               <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <a class="dropdown-item" data-toggle="modal" data-target="#AddMemberModal">Invite Member</a>
-                {% if board_member %}
-                    <a class="dropdown-item" data-toggle="modal" data-target="#RemoveMemberModal">Remove Member</a>
+
+           
+                {% if board_member and board_member.count != 1 %}
+                    <a class="dropdown-item" data-toggle="modal" data-target="#RemoveMemberModal">Remove Member </a>
                 {% endif %}
               </div>
             </div>
-                <div class="dropdown ml-3 text-right">
+                <div class="dropdown ml-3 text-right dropdown-right">
                   <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                   </a>
@@ -214,44 +486,96 @@
                     <a class="dropdown-item" data-toggle="modal" data-target="#ArchiveBoardModal">Archive Board</a>
                   </div>
                 </div>
+            {% else %}
+              <div class="dropdown ml-auto text-right dropdown-right">
+                  <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Settings
+                  </a>
+
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item" data-toggle="modal" data-target="#LeaveConfirmationModal">Leave Board</a>
+                  </div>
+                </div>
             {% endif %}
         </div>
 
     </div>
     <!--  Board Dynamic Design Stuff -->
     <div class ="outer-wrap">
-         
-
-    
         <div class="inner-wrap">
             {% for column in columns %}
             <div class="floatbox">
+              <!-- Column name -->
                    <div id="existing-label-{{column.id}}" class="existing-reactor" data-value="{{ column.id }}">
                       <label data-value="{{ column.id }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
-                        <form id="archive-form" action="{% url 'boards:archive_column' %}" data-url="{% url 'boards:archive_column' %}" data-value="{{column.id}}" novalidate="">
+                      <form id="archive-form" action="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}" data-value="{{column.id}}" novalidate="">
                         <a id="archived-settings"  class="list-settings"><button class="link-style list-settings" type="submit">[X]</button></a>
                     </form>
                   </div>
-                    <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' %}" data-url="{% url 'boards:update_column' %}">
+                    <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}">
                         <input id="exist-list-{{column.id}}" class="form-control title-column-class" data-value="{{column.id}}" value="{{column.name}}"> 
                         <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Update</button> 
                         <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  
                     </form>
+
+                    <hr>
+
+                   
+                {% for card in cards %}
+                    {% if card.column == column %}
+                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
+                        <center>
+                        <label data-value="{{ column.id }}" class=" form-control card-column-class non-editable-add-card">{{card.name}}</label>
+                        </center>
+                        <form id="archive-form" action="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}" data-value="{{column.id}}" novalidate="">
+                      </form>
+                    </div>
+                    
+                <!-- Add Card -->
+                      <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}">
+                          <input id="exist-list-{{column.id}}" class="form-control title-column-class" data-value="{{column.id}}" value="{{card.name}}"> 
+                          <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Update</button> 
+                          <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  
+                      </form>
+                    {% endif %}
+                {% endfor %}
+
+
+                    <div class="add-card-reactor-{{column.id}}">
+                      <label class="form-control title-card-class non-editable-add-card" data-value="{{column.id}}" placeholder="Add List">Add Card</label>
+                  </div>
+
+                  <form id="card-add-form-column-{{column.id}}" class="card-add-form-class toggle-card" action="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}" data-value="{{column.id}}">
+                      <input id="add-card-{{column.id}}" class="form-control title-column-class" placeholder="Enter Another Card Here"> 
+                      <button name="AddColumn" type="submit" class="btn btn-success btn-add-card">Add</button> 
+                      <button id="close-add-card" data-value="{{column.id}}" type="button" class="btn btn-secondary close-add-card">Cancel</button>  
+                  </form>
               </div>
-             
             {% endfor %}
               <div class="floatbox">
                   <div class="add-input-reactor">
                       <label class="form-control title-column-class non-editable-add-column" placeholder="Add List">Add List</label>
                   </div>
+
                   <form id="list-form" action="{% url 'boards:add_column' id=board.id %}" data-url="{% url 'boards:add_column' id=board.id %}">
                       <input id="add-list" class="form-control title-column-class" placeholder="Enter Another List Here"> 
                       <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Add</button> 
                       <button id="close-add-list" type="button" class="btn btn-secondary close-add-list">Cancel</button>  
                   </form>
               </div>
+                <!--  Used for bug fixing a new board -->
+                  
         </div>  
     </div>
 </div>
-        
+      <input id="hidden-card-add-values" type="hidden" value="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}"></input>
+      <input id="hidden-column-archive-values" type="hidden" value="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}"></input>
+      <input id="hidden-column-update-values" type="hidden" value="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}"></input>  
+      <input id="hidden-column-get-board" type="hidden" value="{% url 'boards:get_board' id=board.id %}" data-url="{% url 'boards:get_board' id=board.id %}"></input>
+      <input id="hidden-column-update-description" type="hidden" value="{% url 'boards:update_card_description' id=board.id %}" data-url="{% url 'boards:update_card_description' id=board.id %}"></input>  
+      <input id="hidden-comment-add" type="hidden" value="{% url 'boards:add_comment_card' id=board.id %}" data-url="{% url 'boards:add_comment_card' id=board.id %}"></input>  
+      <input id="hidden-get-card-action" type="hidden" value="{% url 'boards:get_card_detail' id=board.id %}" data-url="{% url 'boards:get_card_detail' id=board.id %}"></input>  
+      <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
+      <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
+      
 {% endblock %}

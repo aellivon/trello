@@ -4,6 +4,8 @@
        local('abc');
 }*/
 
+
+
 html,body {
   height:100%;
   width:100%;
@@ -11,7 +13,73 @@ html,body {
 }
 body {
   display:flex;
-  
+}
+
+..modal {
+  overflow-y:auto;
+}
+
+
+.textarea {
+  padding: 10px;
+  resize: none;
+  width: 100%;
+  height: 80%;
+  text-indent: 0px;
+}
+
+.hr { 
+    display: block;
+    color: black;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 2px;
+}
+
+.hr-comment{
+    display: block;
+    color: black;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 2px;
+}
+
+.modal-card-add-comment{
+    padding-top: 10px;
+    font-weight: bold;
+}
+
+
+.card-button-invite{
+    width: 100px;
+    margin:auto;
+    width: 100%;
+}
+
+.card-button-due-date{
+    width: 100px;
+    margin:auto;
+    width: 100%;
+}
+
+.toggle-card{
+    display: none;
+}
+.btn-add-card{
+    margin-top: 10px;
+}
+
+.close-add-card{
+     margin-top: 10px;
+}
+.dropdown-right{
+    margin-right: 10px;
 }
 
 .link-style {
@@ -28,8 +96,8 @@ body {
     color:white;
     margin-left: -18px;
     float:left;
-    background-color:#808080;
-    border-color: #808080;
+    background-color:black;
+    border-color: black;
     color: white;
     z-index: 10;
 }
@@ -40,6 +108,96 @@ body {
 
 #list-form{
 	display:none;
+}
+
+.class-card-modal{
+    width: 850px !important;
+}
+
+.comment-portion-of-modal{
+}
+
+.card-comment-user{
+    font-size: 17px;
+}
+
+
+.additional-option-comment{
+    background-color: transparent;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.card-comment-time-user{
+
+    font-size: 15px;
+}
+
+.left-portion-of-modal{
+    height: 150px;
+    float:left;
+}
+
+.right-portion-of-modal{
+    float:left;
+    text-align: center;
+}
+
+.left-portion-of-header{
+    float:left;
+}
+
+.right-portion-of-header{
+    float:left;
+    text-align: center;
+}
+.modal-label-desc{
+    font-weight: bold;
+}
+
+.display-none{
+    display: none;
+}
+
+.modal-label-manage{
+    font-weight: bold;
+}
+
+.card-description{
+    min-height:100px;
+    text-indent: 40px;
+    padding: 10px;
+    text-align: justify;
+}
+
+.card-button-add-description{
+    margin-bottom: 30px;
+    padding-left:10px;
+}
+
+#card-button-cancel-description{
+    margin-right: 10px;
+}
+
+#card-button-cancel-comment{
+    margin-right: 10px;
+}
+
+
+.card-comments{
+    min-height:20px;
+    max-height: 100px;
+    text-indent: 10px;
+    text-align: justify;
+    overflow-y: auto;
+}
+
+
+
+.card-class-title{
+    width: 75%;
+    margin-left: 15px;
+    font-size: 20px;
 }
 
 .custom-navbar{
@@ -156,18 +314,29 @@ hr.border{
 	height: 35px;
 }
 
+.card-column-class{
+    height: 70px;
+}
+
+
 .btn-add-list{
 	margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .close-add-list{
 	margin-top: 5px;
 }
 
-
+.non-editable-add-card{
+    float: left;    
+    background-color:#808080;
+    border-color: #808080;
+    color: white;
+}
 .non-editable-add-column{
     float: left;
-	background-color:#808080;
+	background-color:black;
 	border-color: #808080;
     color: white;
 }
@@ -271,6 +440,7 @@ hr.border{
     float:left;
     margin-right:-999em;
     padding-left:20px;
+    height: 100%;
 }
 .floatbox {
     float:left; /*force into block level for dimensions*/

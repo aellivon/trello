@@ -2,18 +2,23 @@ from django.shortcuts import render
 from .models import User
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, View
-from .models import Board, BoardMember, Referral, Column
+from .models import Board, BoardMember, Referral, Column, Card, CardComment, CardMember
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
-from django.http import HttpResponse, HttpResponseRedirect,HttpResponseBadRequest
+from django.http import (HttpResponse, HttpResponseRedirect,
+    HttpResponseBadRequest, JsonResponse)
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .mixins import AJAXBoardMixIn, AJAXCardMixIn, BoardPermissionMixIn
 from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
+import json as simplejson
 from django.core import serializers
 from django.db.models import Max
+import dateutil.parser
+import pytz
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -31,7 +36,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
         username = self.kwargs.get('username')
         user = get_object_or_404(User,username=username)
         boards = BoardMember.objects.filter(
-            user=user,board__archived=False,is_confirmed=True)
+            user=user,board__archived=False,is_confirmed=True).order_by('-pk')
         return render(self.request, self.template_name,
             {'form':context, 'boards': boards, 'current_user' : username}
         )
@@ -44,7 +49,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
         if form.is_valid():
             form.save_board(user)
             boards = BoardMember.objects.filter(
-                user=user,board__archived=False,is_confirmed=True)
+                user=user,board__archived=False,is_confirmed=True).order_by('-pk')
             form = self.form()
             return render(self.request, self.template_name,
                 {'form':form, 'boards': boards, 'current_user' : username}
@@ -59,6 +64,10 @@ class IndexView(LoginRequiredMixin,TemplateView):
 
 
 class BoardView(LoginRequiredMixin, TemplateView):
+    """
+        Handling the upper part of the board and initialization of 
+        the board itself.
+    """
     # Reverse lazy is needed since this code is before the Url coniguration
     # is loaded
     login_url = reverse_lazy('users:log_in')
@@ -76,9 +85,14 @@ class BoardView(LoginRequiredMixin, TemplateView):
             is_confirmed=True,board__id=board_id)
         board = get_object_or_404(Board,pk=board_id)
         board_member = BoardMember.objects.filter(
-            board__id=board_id).exclude(user=board.owner)
+            board__id=board_id)
+        referral = Referral.objects.filter(
+            board_member__board__id=board_id).exclude(
+                board_member__user=board.owner)
         columns = Column.objects.filter(
             board__id=board_id,archived=False).order_by('position')
+        card = Card.objects.filter(
+            column__board__id=board_id,archived=False)
         owner = False
         if board.owner == self.request.user:
             owner = True
@@ -86,7 +100,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
             {
                 'board_form': board_form, 'member_form': member_form,
                 'board':board, 'current_user' : username, 'message_box': None,
-                'owner' : owner, 'board_member' : board_member, 'columns' : columns
+                'owner' : owner, 'board_member' : board_member, 'columns' : columns,
+                'referral' : referral, 'cards': card, 'owner_instance' : board.owner
             }
         )
 
@@ -101,7 +116,12 @@ class BoardView(LoginRequiredMixin, TemplateView):
             board__id=board_id,archived=False).order_by('position')
         owner = False
         board_member = BoardMember.objects.filter(
-            board__id=board_id).exclude(user=board.owner)
+            board__id=board_id)
+        referral = Referral.objects.filter(
+            board_member__board__id=board_id).exclude(
+            board_member__user=board.owner)
+        card = Card.objects.filter(
+            column__board__id=board_id,archived=False)
         if board.owner == self.request.user:
             owner = True
         # Edit Board Form
@@ -116,7 +136,10 @@ class BoardView(LoginRequiredMixin, TemplateView):
                         {
                             'board_form': board_form, 'member_form': member_form,
                             'board':board, 'current_user' : username,
-                            'message_box':None, 'owner' : owner, 'board_member' : board_member
+                            'message_box':None, 'owner' : owner,
+                            'board_member' : board_member, 'columns' : columns,
+                            'referral': referral, 'cards': card,
+                            'owner_instance' : board.owner
                         }
                     )
             # Failing validation will render this template below
@@ -124,7 +147,10 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                  'board_form': board_form, 'member_form': member_form,
                  'board':board, 'current_user' : username,
-                 'message_box':None, 'owner' : owner, 'board_member' : board_member
+                 'message_box':None, 'owner' : owner,
+                 'board_member' : board_member, 'columns' : columns, 
+                 'referral' : referral, 'cards': card, 
+                 'owner_instance' : board.owner
                 }
             )
         # Archiving Board Form
@@ -141,7 +167,9 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                     'board_form': board_form, 'member_form': member_form,
                     'board':board, 'current_user' : username,
-                    'message_box': None, 'owner' : owner, 'board_member' : board_member
+                    'message_box': None, 'owner' : owner, 'board_member' : board_member,
+                     'columns' : columns, 'referral':referral, 'cards': card,
+                     'owner_instance' : board.owner
                 }
             )
         # Inviting a member form
@@ -162,7 +190,10 @@ class BoardView(LoginRequiredMixin, TemplateView):
                     {
                        'board_form': board_form, 'member_form': member_form,
                        'board':board, 'current_user' : username,
-                        'message_box':message_box, 'owner' : owner, 'board_member' : board_member
+                        'message_box':message_box, 'owner' : owner,
+                        'board_member' : board_member, 'columns' : columns,
+                        'referral' : referral, 'cards': card,
+                        'owner_instance' : board.owner
                     }
                 )
 
@@ -171,29 +202,58 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                    'board_form': board_form, 'member_form': member_form,
                    'board':board, 'current_user' : username,
-                   'message_box':None, 'owner' : owner, 'board_member' : board_member
+                   'message_box':None, 'owner' : owner,
+                    'board_member' : board_member, 'columns' : columns,
+                    'referral' : referral, 'cards': card,
+                    'owner_instance' : board.owner
                 }
             )
         elif 'RemoveMemberModal' in self.request.POST:
             stacked_id_to_remove = self.request.POST.getlist('remove_member')
             member_form = self.member_form()
             board_form = self.board_form()
-            member_form.remove_member(stacked_id_to_remove)
+            member_form.remove_members(stacked_id_to_remove)
             return render(self.request, self.template_name,
                 {
                    'board_form': board_form, 'member_form': member_form,
                    'board':board, 'current_user' : username,
-                   'message_box':None, 'owner' : owner, 'board_member' : board_member
+                   'message_box':None, 'owner' : owner, 'board_member' : board_member,
+                    'columns' : columns, 'referral' : referral, 'cards': card,
+                    'owner_instance' : board.owner
                 }
             )
+        elif 'LeaveConfirmationModal' in self.request.POST:
+            member_form = self.member_form()
+            board_form = self.board_form()
+            user_id = self.request.user.id
+            member_form.remove_member(user_id, board)
+            return HttpResponseRedirect(reverse('boards:home' , 
+                kwargs={'username': username 
+            }))
 
-class AddColumnView(View):
-    """
-    """
 
+
+
+# ajax implementation
+
+class GetBoardDetails(LoginRequiredMixin, BoardPermissionMixIn , AJAXBoardMixIn, View):
+    """
+        This class simply refreshes the board itself
+    """
+    login_url = reverse_lazy('users:log_in')
+    def get(self, *args, **kwargs):
+        data = self.return_board()
+        return JsonResponse(data)
+
+class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+    """
+        This class adds a column in the board and refreshses the board itself.
+    """
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
         board_id = self.kwargs.get('id')
+
         board = get_object_or_404(Board,pk=board_id)
         max_position=Column.objects.filter(archived=False).aggregate(Max('position'))
         to_add_position = 1 
@@ -201,37 +261,200 @@ class AddColumnView(View):
         if  maximum_exists:
             to_add_position =   maximum_exists + 1
         new_column = Column(board=board,name=title,position=to_add_position)
-
         new_column.save()
-        all_columns = Column.objects.filter(
-            board__id=board_id,archived=False).order_by('position')
-        data=serializers.serialize('json', all_columns)
-        return HttpResponse(data)
+        data = self.return_board()
+        # needs to be changed
+        return JsonResponse(data)
 
-class UpdateColumnView(View):
 
+
+class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+    """
+        This class updates the column name and refreshes the board itself
+    """
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
         to_update_id = self.request.POST.get('id')
         column=get_object_or_404(Column,id=to_update_id)
         column.name = title
         column.save()
-        all_columns = Column.objects.filter(
-            board__id=column.board.id,archived=False).order_by('position')
-        data=serializers.serialize('json', all_columns)
-        return HttpResponse(data)
+        data = self.return_board()
+        # needs to be changed
+        return JsonResponse(data)
 
-class ArchiveColumnView(View):
 
+class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+    """
+        This class archives the column and refreshes the board itself
+    """
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         to_update_id = self.request.POST.get('id')
         column=get_object_or_404(Column,id=to_update_id)
         column.archived = True
         column.save()
-        all_columns = Column.objects.filter(
-            board__id=column.board.id,archived=False).order_by('position')
-        data=serializers.serialize('json', all_columns)
-        return HttpResponse(data)
+        data = self.return_board()
+        # needs to be changed
+        return JsonResponse(data)
+
+
+class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+    """
+        This class adds a card and refreshes the board itself to reflect
+        those changes
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        name = self.request.POST.get('name')
+        column_id = self.request.POST.get('id')
+        column = get_object_or_404(Column,pk=column_id)
+        new_card = Card(name=name,column=column)
+        new_card.save()
+        data = self.return_board()
+        return JsonResponse(data)
+
+class GetCardDetails(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+    """
+        This class reloads the card modal.
+    """
+    login_url = reverse_lazy('users:log_in')
+    def get(self, *args, **kwargs):
+        data=self.return_card()
+        return JsonResponse(data)
+
+class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+    """
+        This class updates the card title and reloads the card modal
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        name =  self.request.POST.get('title')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        card.name = name
+        card.save()
+        data=self.return_card()
+        return JsonResponse(data)
+
+class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
+    """
+        This class updates the card description and reloads the card modal
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        description =  self.request.POST.get('description')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        card.description = description
+        card.save()
+        return HttpResponse('success!')
+
+
+
+class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+    """
+        This class adds a comment to the card and refreshes the comment section
+        of the modal
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        comment =  self.request.POST.get('comment')
+        card_id = self.request.POST.get('card_id')
+        if comment != "":
+            card = get_object_or_404(Card, pk=card_id)
+            new_comment = CardComment(card=card, user=self.request.user, comment=comment)
+            new_comment.save()
+        data=self.return_card()
+        return JsonResponse(data)
+
+class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+    """
+        This class deletes a comment and refreshes the comment section of the 
+        modal
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        comment_id = self.request.POST.get('comment_id')
+        CardComment.objects.get(pk=comment_id).delete()
+        data=self.return_card()
+        return JsonResponse(data)
+
+class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+    """
+        This class assigns members to a card. 
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        selected = self.request.POST.getlist('selected[]')
+        not_selected = self.request.POST.getlist('not_selected[]')
+        card_id = self.request.POST.get('card_id')
+        card_instance = get_object_or_404(Card,pk=card_id)
+        for element in selected:
+            board_member = get_object_or_404(BoardMember,user__pk=element)
+            new_card_member= CardMember(board_member=board_member,card=card_instance)
+            new_card_member.save()
+
+        for element in not_selected:
+            CardMember.objects.filter(board_member__user__id=element).delete()
+
+        
+        data=self.return_card()
+        return JsonResponse(data)
+
+class GetMembers(LoginRequiredMixin, BoardPermissionMixIn, View):
+    """
+        This class fetches all the members for further use
+    """
+    login_url = reverse_lazy('users:log_in')
+    def get(self, *args, **kwargs):
+        card_id = self.request.GET.get('card_id')
+        card_member = CardMember.objects.filter(
+            card__pk=card_id)
+        serialized_card_member = serializers.serialize('json', card_member)
+        data = {'card_member' : serialized_card_member}
+        return JsonResponse(data)
+
+class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
+    """
+        GET: This class gets the due date of a card when get request is called.
+        
+        POST: When post request is called, it updates the due date value
+            of the value itself.
+    """
+    login_url = reverse_lazy('users:log_in')
+    def get(self, *args, **kwargs):
+        card_id = self.request.GET.get('card_id')
+        card = [get_object_or_404(Card,pk=card_id)]
+        serialized_card = serializers.serialize('json', card)
+        data = {'card' : serialized_card}
+        return JsonResponse(data)
+
+    def post(self, *args, **kwargs):
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card,pk=card_id)
+        try:
+            parsed_date = dateutil.parser.parse(self.request.POST.get('due_date'))
+        except Exception as e:
+            return HttpResponse(e)
+
+        card.due_date = parsed_date
+        card.save()
+        return HttpResponse('success!')
+
+class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+    """
+        This class archives the card that is currently selected.
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        print('hi')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        card.archived = True
+        card.save()
+        data = self.return_board()
+        return JsonResponse(data)
 
 
 class UserValidationView(TemplateView):
