@@ -10,7 +10,7 @@ from django.http import (HttpResponse, HttpResponseRedirect,
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .mixins import AJAXBoardMixIn, AJAXCardMixIn
+from .mixins import AJAXBoardMixIn, AJAXCardMixIn, BoardPermissionMixIn
 from users.mixins import ThrowHomeIfLoggedInMixIn
 from django.contrib.auth import logout, authenticate, login
 from django.http import JsonResponse
@@ -83,7 +83,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
         board_member = BoardMember.objects.filter(
             board__id=board_id)
         referral = Referral.objects.filter(
-            board_member__board__id=board_id).exclude( board_member__user=board.owner)
+            board_member__board__id=board_id).exclude(
+                board_member__user=board.owner)
         columns = Column.objects.filter(
             board__id=board_id,archived=False).order_by('position')
         card = Card.objects.filter(
@@ -113,7 +114,8 @@ class BoardView(LoginRequiredMixin, TemplateView):
         board_member = BoardMember.objects.filter(
             board__id=board_id)
         referral = Referral.objects.filter(
-            board_member__board__id=board_id).exclude( board_member__user=board.owner)
+            board_member__board__id=board_id).exclude(
+            board_member__user=board.owner)
         card = Card.objects.filter(
             column__board__id=board_id,archived=False)
         if board.owner == self.request.user:
@@ -130,8 +132,9 @@ class BoardView(LoginRequiredMixin, TemplateView):
                         {
                             'board_form': board_form, 'member_form': member_form,
                             'board':board, 'current_user' : username,
-                            'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                            'columns' : columns, 'referral': referral, 'cards': card,
+                            'message_box':None, 'owner' : owner,
+                            'board_member' : board_member, 'columns' : columns,
+                            'referral': referral, 'cards': card,
                             'owner_instance' : board.owner
                         }
                     )
@@ -140,8 +143,9 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                  'board_form': board_form, 'member_form': member_form,
                  'board':board, 'current_user' : username,
-                 'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                 'columns' : columns, 'referral' : referral, 'cards': card, 
+                 'message_box':None, 'owner' : owner,
+                 'board_member' : board_member, 'columns' : columns, 
+                 'referral' : referral, 'cards': card, 
                  'owner_instance' : board.owner
                 }
             )
@@ -182,8 +186,9 @@ class BoardView(LoginRequiredMixin, TemplateView):
                     {
                        'board_form': board_form, 'member_form': member_form,
                        'board':board, 'current_user' : username,
-                        'message_box':message_box, 'owner' : owner, 'board_member' : board_member,
-                        'columns' : columns, 'referral' : referral, 'cards': card,
+                        'message_box':message_box, 'owner' : owner,
+                        'board_member' : board_member, 'columns' : columns,
+                        'referral' : referral, 'cards': card,
                         'owner_instance' : board.owner
                     }
                 )
@@ -193,8 +198,9 @@ class BoardView(LoginRequiredMixin, TemplateView):
                 {
                    'board_form': board_form, 'member_form': member_form,
                    'board':board, 'current_user' : username,
-                   'message_box':None, 'owner' : owner, 'board_member' : board_member,
-                    'columns' : columns, 'referral' : referral, 'cards': card,
+                   'message_box':None, 'owner' : owner,
+                    'board_member' : board_member, 'columns' : columns,
+                    'referral' : referral, 'cards': card,
                     'owner_instance' : board.owner
                 }
             )
@@ -226,13 +232,16 @@ class BoardView(LoginRequiredMixin, TemplateView):
 
 # ajax implementation
 
-class GetBoardDetails(AJAXBoardMixIn, View):
-    
+class GetBoardDetails(LoginRequiredMixin, BoardPermissionMixIn , AJAXBoardMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         data = self.return_board()
         return JsonResponse(data)
 
-class AddColumnView(AJAXBoardMixIn, View):
+class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
         board_id = self.kwargs.get('id')
@@ -251,8 +260,9 @@ class AddColumnView(AJAXBoardMixIn, View):
 
 
 
-class UpdateColumnView(AJAXBoardMixIn, View):
+class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
 
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         title = self.request.POST.get('title')
         to_update_id = self.request.POST.get('id')
@@ -264,8 +274,9 @@ class UpdateColumnView(AJAXBoardMixIn, View):
         return JsonResponse(data)
 
 
-class ArchiveColumnView(AJAXBoardMixIn, View):
+class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
 
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         to_update_id = self.request.POST.get('id')
         column=get_object_or_404(Column,id=to_update_id)
@@ -276,8 +287,9 @@ class ArchiveColumnView(AJAXBoardMixIn, View):
         return JsonResponse(data)
 
 
-class AddCardView(AJAXBoardMixIn, View):
+class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
 
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         name = self.request.POST.get('name')
         column_id = self.request.POST.get('id')
@@ -287,13 +299,16 @@ class AddCardView(AJAXBoardMixIn, View):
         data = self.return_board()
         return JsonResponse(data)
 
-class GetCardDetails(AJAXCardMixIn, View):
+class GetCardDetails(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         data=self.return_card()
         return JsonResponse(data)
 
-class UpdateCardTitle(AJAXCardMixIn, View):
+class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
 
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         name =  self.request.POST.get('title')
         card_id = self.request.POST.get('card_id')
@@ -303,8 +318,9 @@ class UpdateCardTitle(AJAXCardMixIn, View):
         data=self.return_card()
         return JsonResponse(data)
 
-class UpdateCardDescription(View):
+class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
 
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         description =  self.request.POST.get('description')
         card_id = self.request.POST.get('card_id')
@@ -315,8 +331,9 @@ class UpdateCardDescription(View):
 
 
 
-class AddCommentCard(AJAXCardMixIn, View):
+class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
 
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         comment =  self.request.POST.get('comment')
         card_id = self.request.POST.get('card_id')
@@ -327,14 +344,18 @@ class AddCommentCard(AJAXCardMixIn, View):
         data=self.return_card()
         return JsonResponse(data)
 
-class DeleteComment(AJAXCardMixIn, View):
+class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         comment_id = self.request.POST.get('comment_id')
         CardComment.objects.filter(pk=comment_id).delete()
         data=self.return_card()
         return JsonResponse(data)
 
-class AssignMembers(AJAXCardMixIn, View):
+class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         selected = self.request.POST.getlist('selected[]')
         not_selected = self.request.POST.getlist('not_selected[]')
@@ -352,7 +373,9 @@ class AssignMembers(AJAXCardMixIn, View):
         data=self.return_card()
         return JsonResponse(data)
 
-class GetMembers(View):
+class GetMembers(LoginRequiredMixin, BoardPermissionMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         card_id = self.request.GET.get('card_id')
         card_member = CardMember.objects.filter(
@@ -361,7 +384,9 @@ class GetMembers(View):
         data = {'card_member' : serialized_card_member}
         return JsonResponse(data)
 
-class DueDate(View):
+class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def get(self, *args, **kwargs):
         card_id = self.request.GET.get('card_id')
         card = [get_object_or_404(Card,pk=card_id)]
@@ -379,7 +404,9 @@ class DueDate(View):
         card.save()
         return HttpResponse('success!')
 
-class ArhiveCard(AJAXBoardMixIn, View):
+class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+
+    login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         print('hi')
         card_id = self.request.POST.get('card_id')
@@ -388,9 +415,6 @@ class ArhiveCard(AJAXBoardMixIn, View):
         card.save()
         data = self.return_board()
         return JsonResponse(data)
-
-
-
 
 
 class UserValidationView(TemplateView):

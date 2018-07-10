@@ -1,10 +1,11 @@
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
-from .models import Column, Card, CardComment
+from .models import Column, Card, CardComment, BoardMember
 import json as simplejson
 from django.core import serializers
 from django.shortcuts import get_object_or_404
+from annoying.functions import get_object_or_None
 
 
 class AJAXBoardMixIn():
@@ -49,6 +50,17 @@ class AJAXCardMixIn():
                     'current_user' : current_user }
         return data
 
-"""
-   To Add Permission Mix Ins
-"""
+class BoardPermissionMixIn():
+    """
+        board permission mix in
+    """
+    def dispatch(self, request, *args, **kwargs):
+        board_id = self.kwargs.get('id')
+        user_id = self.request.user.id
+        # Permission Denied if 404
+        exists = get_object_or_None(
+            BoardMember, board__id=board_id,user__pk= user_id)
+        if not exists:
+            return HttpResponseBadRequest()
+
+        return super().dispatch(request, *args, **kwargs)

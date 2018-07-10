@@ -365,7 +365,7 @@
                     </div>
 
                   <div class="modal-footer">
-                    <button id="delete-comment-yes" data-url="{% url 'boards:delete_comment' %}" data-to_remove="0" type="submit" class="btn btn-primary">Yes</button>
+                    <button id="delete-comment-yes" data-url="{% url 'boards:delete_comment' id=board.id %}" data-to_remove="0" type="submit" class="btn btn-primary">Yes</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
                   </div>
           
@@ -523,7 +523,7 @@
                    
                 {% for card in cards %}
                     {% if card.column == column %}
-                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' %}">
+                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
                         <center>
                         <label data-value="{{ column.id }}" class=" form-control card-column-class non-editable-add-card">{{card.name}}</label>
                         </center>
@@ -572,9 +572,9 @@
       <input id="hidden-column-archive-values" type="hidden" value="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}"></input>
       <input id="hidden-column-update-values" type="hidden" value="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}"></input>  
       <input id="hidden-column-get-board" type="hidden" value="{% url 'boards:get_board' id=board.id %}" data-url="{% url 'boards:get_board' id=board.id %}"></input>
-      <input id="hidden-column-update-description" type="hidden" value="{% url 'boards:update_card_description' %}" data-url="{% url 'boards:update_card_description' %}"></input>  
-      <input id="hidden-comment-add" type="hidden" value="{% url 'boards:add_comment_card' %}" data-url="{% url 'boards:add_comment_card' %}"></input>  
-      <input id="hidden-get-card-action" type="hidden" value="{% url 'boards:get_card_detail' %}" data-url="{% url 'boards:get_card_detail' %}"></input>  
+      <input id="hidden-column-update-description" type="hidden" value="{% url 'boards:update_card_description' id=board.id %}" data-url="{% url 'boards:update_card_description' id=board.id %}"></input>  
+      <input id="hidden-comment-add" type="hidden" value="{% url 'boards:add_comment_card' id=board.id %}" data-url="{% url 'boards:add_comment_card' id=board.id %}"></input>  
+      <input id="hidden-get-card-action" type="hidden" value="{% url 'boards:get_card_detail' id=board.id %}" data-url="{% url 'boards:get_card_detail' id=board.id %}"></input>  
       <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
       <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
       
