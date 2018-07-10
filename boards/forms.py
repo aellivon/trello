@@ -75,7 +75,7 @@ class MembersModalForm(forms.Form):
             BoardMember.objects.filter(pk=id).delete()
 
     def remove_member(self, user_id, board):
-        BoardMember.objects.filter(user__id=user_id, board=board).delete()
+        BoardMember.objects.get(user__id=user_id, board=board).delete()
 
 
     def clean_email(self):

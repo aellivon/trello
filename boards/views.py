@@ -349,7 +349,7 @@ class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         comment_id = self.request.POST.get('comment_id')
-        CardComment.objects.filter(pk=comment_id).delete()
+        CardComment.objects.get(pk=comment_id).delete()
         data=self.return_card()
         return JsonResponse(data)
 
