@@ -46,9 +46,9 @@ class AJAXCardMixIn():
                  'current_user' : current_user}
         else:
             data = { 'cards' : serialized_data_cards,
-                    'current_user' : serialized_current_user }
+                    'current_user' : current_user }
         return data
 
 """
-    Missing Permission Mix In
+   To Add Permission Mix Ins
 """

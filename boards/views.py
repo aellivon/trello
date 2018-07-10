@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import User
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, View
-from .models import Board, BoardMember, Referral, Column, Card, CardComment
+from .models import Board, BoardMember, Referral, Column, Card, CardComment, CardMember
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
 from django.http import (HttpResponse, HttpResponseRedirect,
@@ -17,6 +17,8 @@ from django.http import JsonResponse
 import json as simplejson
 from django.core import serializers
 from django.db.models import Max
+import dateutil.parser
+import pytz
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -312,16 +314,82 @@ class UpdateCardDescription(View):
         return HttpResponse('success!')
 
 
+
 class AddCommentCard(AJAXCardMixIn, View):
 
     def post(self, *args, **kwargs):
         comment =  self.request.POST.get('comment')
         card_id = self.request.POST.get('card_id')
-        card = get_object_or_404(Card, pk=card_id)
-        new_comment = CardComment(card=card, user=self.request.user, comment=comment)
-        new_comment.save()
+        if comment != "":
+            card = get_object_or_404(Card, pk=card_id)
+            new_comment = CardComment(card=card, user=self.request.user, comment=comment)
+            new_comment.save()
         data=self.return_card()
         return JsonResponse(data)
+
+class DeleteComment(AJAXCardMixIn, View):
+    def post(self, *args, **kwargs):
+        comment_id = self.request.POST.get('comment_id')
+        CardComment.objects.filter(pk=comment_id).delete()
+        data=self.return_card()
+        return JsonResponse(data)
+
+class AssignMembers(AJAXCardMixIn, View):
+    def post(self, *args, **kwargs):
+        selected = self.request.POST.getlist('selected[]')
+        not_selected = self.request.POST.getlist('not_selected[]')
+        card_id = self.request.POST.get('card_id')
+        card_instance = get_object_or_404(Card,pk=card_id)
+        for element in selected:
+            board_member = get_object_or_404(BoardMember,user__pk=element)
+            new_card_member= CardMember(board_member=board_member,card=card_instance)
+            new_card_member.save()
+
+        for element in not_selected:
+            CardMember.objects.filter(board_member__user__id=element).delete()
+
+        
+        data=self.return_card()
+        return JsonResponse(data)
+
+class GetMembers(View):
+    def get(self, *args, **kwargs):
+        card_id = self.request.GET.get('card_id')
+        card_member = CardMember.objects.filter(
+            card__pk=card_id)
+        serialized_card_member = serializers.serialize('json', card_member)
+        data = {'card_member' : serialized_card_member}
+        return JsonResponse(data)
+
+class DueDate(View):
+    def get(self, *args, **kwargs):
+        card_id = self.request.GET.get('card_id')
+        card = [get_object_or_404(Card,pk=card_id)]
+        serialized_card = serializers.serialize('json', card)
+        data = {'card' : serialized_card}
+        return JsonResponse(data)
+
+    def post(self, *args, **kwargs):
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card,pk=card_id)
+        parsed_date = dateutil.parser.parse(self.request.POST.get('due_date'))
+
+        print (card.name)
+        card.due_date = parsed_date
+        card.save()
+        return HttpResponse('success!')
+
+class ArhiveCard(AJAXBoardMixIn, View):
+    def post(self, *args, **kwargs):
+        print('hi')
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card, pk=card_id)
+        card.archived = True
+        card.save()
+        data = self.return_board()
+        return JsonResponse(data)
+
+
 
 
 

@@ -86,7 +86,16 @@ $(document).ready(function() {
         })
 
         $('#ArchiveCardConfirmation').on('hidden.bs.modal', function () {
+
+            console.log($(this).data('hide'));
+            if($(this).data('hide')=="yes"){
+                $(this).data('hide','no');
+                $('#CardModal').modal('hide');
+            }else{
+
                 $('#CardModal').modal('show');
+            }
+
         })
 
         $('#DueDateModal').on('hidden.bs.modal', function () {
@@ -212,10 +221,37 @@ $(document).ready(function() {
                 minuteFormatted = minute < 10 ? "0" + minute : minute,
                 morning = hour < 12 ? "am" : "pm";
 
-            return month + "/" + day + "/" + year + " " + hourFormatted + ":" +
+            return month + "/" + day + "/" + year + ", " + hourFormatted + ":" +
                     minuteFormatted + morning;
         }
 
+        function zero_padding(val) {
+            // padding for date month
+            // date time local doesn't accept '7' -> must be '07'
+          if (val >= 10)
+            return val;
+          else
+            return '0' + val;
+        }
+
+        function format_date_for_input(date) {
+            var year = date.getFullYear(),
+                month = date.getMonth() + 1, 
+                day = date.getDate(),
+                hour = date.getHours(),
+                minute = date.getMinutes(),
+                second = date.getSeconds(),
+                hourFormatted = hour % 12 || 12, 
+                minuteFormatted = minute < 10 ? "0" + minute : minute,
+                morning = hour < 12 ? "am" : "pm";
+
+                month = zero_padding(month);
+                hour = zero_padding(hour);
+
+
+            return year + "-" + month + "-" + day + "T" + hour + ":" +
+                    minuteFormatted;
+        }
 
 
         // Ajax Calls
@@ -270,6 +306,144 @@ $(document).ready(function() {
         });
 
 
+        pop_members = function(data){
+
+            $('.assign-division input').each(function () {
+                console.log(this.value);
+                card_member = JSON.parse(data.card_member);
+                var count = 0;
+                while(count < card_member.length){
+                    if(card_member[count].fields.board_member == this.value){
+                        $(this).prop('checked', true);
+                    }else{
+                        $(this).prop('checked', false);
+                    }
+                    count+=1;
+                }
+                
+            });
+        }
+
+        $(document).on('click','#pop-assign-members', function(e){
+            e.preventDefault();
+            card_id =$('#heading-card-title').data('card_id');
+            url = $('#hidden-get-assigned-members').data('url');
+            data = {
+                card_id : card_id
+            }
+
+            $.get(url,data, pop_members,'json') 
+            .fail(function(err){
+                console.log(err);
+             })
+
+
+        });
+
+
+        successful_archive = function(data){
+            $('#ArchiveCardConfirmation').modal('hide');
+            reload_inner_wrapper(data);
+            $('#ArchiveCardConfirmation').data('hide','yes');
+        }
+
+        $(document).on('click','#archive-card-confirmation', function(e){
+            e.preventDefault();
+            card_id =$('#heading-card-title').data('card_id');
+            url=$(this).data('url');
+            console.log(url);
+            console.log(card_id);
+            data = {
+                card_id : card_id
+            }
+             $.post(url,data,successful_archive ,'json') 
+            .fail(function(err){
+                console.log(err);
+             })
+
+        });
+
+          $(document).on('click','#set-due-date', function(e){
+            // Setting Due Date
+            e.preventDefault();
+            card_id =$('#heading-card-title').data('card_id');
+            date =$('#input-due-date').val();
+            console.log(date);
+            url = $('#hidden-get-due-date').data('url');
+            data = {
+                card_id : card_id,
+                due_date : date
+            }
+
+            $.post(url,data, null
+                ,'text') 
+            .done(function() {
+                $('#CardModal').modal('show');
+                $('#DueDateModal').modal('hide');
+              })
+            .fail(function(err){
+                console.log(err);
+             })
+        });
+
+
+        pop_due_date = function(data){
+            console.log(data);
+            card = JSON.parse(data.card);
+            if (card[0].fields.due_date != null){
+                to_set = new Date(card[0].fields.due_date);
+                to_set = format_date_for_input(to_set);
+                // Vanilla Java Script
+                console.log(to_set);
+                $("#input-due-date").val(to_set);
+                
+            }
+        }
+
+        $(document).on('click','#pop-due-date', function(e){
+            e.preventDefault();
+            card_id =$('#heading-card-title').data('card_id');
+            url = $('#hidden-get-due-date').data('url');
+
+            data = {
+                card_id : card_id
+            }
+
+            $.get(url,data, pop_due_date,'json') 
+            .fail(function(err){
+                console.log(err);
+             })
+
+
+        });
+        $(document).on('click','#btnAssignRemove', function(e){
+            // Assingning and removing a member
+            e.preventDefault()
+            $('#CardMemberModal').modal('hide');
+            var selected = [];
+            $('.assign-division input:checked').each(function() {
+                selected.push($(this).attr('value'));
+            });
+            var not_selected = [];
+            $('.assign-division input:checkbox:not(:checked)').each(function() {
+                not_selected.push($(this).attr('value'));
+            });
+
+            card_id =$('#heading-card-title').data('card_id');
+
+            data = {
+                not_selected : not_selected,
+                selected : selected,
+                card_id : card_id
+            }
+            console.log(data);
+            var url = $(this).data('action');
+                
+            $.post(url,data,reload_card,'json'), function(err){
+                console.log('error');
+            };
+        });
+
         $(document).on('submit','.card-add-form-class', function(e){
             e.preventDefault()
             id=$(this).data('value');
@@ -304,6 +478,35 @@ $(document).ready(function() {
              })
 
         });
+
+        $(document).on("click", '.class-delete-comment', function(){
+            // Loading delete value to modal
+            value = $('.class-delete-comment').data('value');
+            console.log(value + " to_delete");
+            $('#delete-comment-yes').data('to_remove',value);
+        });
+
+        $(document).on("click", '#delete-comment-yes', function(){
+            // Deleting a comment
+            $('#DeleteCommentModal').modal('hide');
+            id=$('#delete-comment-yes').data('to_remove');
+            url =$('#delete-comment-yes').data('url');
+            card_id =$('#heading-card-title').data('card_id');
+            console.log(id);
+            var title=$('#input-card-title').val();
+            if (title){
+                    data = {
+                        comment_id : id,
+                        card_id : card_id
+                    }
+
+                    $.post(url,data,reload_card,'json')
+                    .fail(function(err){
+                        console.log(err);
+                    })
+            }
+        });
+
 
         // Changing text card title action
         $(document).on("input", "#input-card-title", function(){
@@ -340,8 +543,8 @@ $(document).ready(function() {
             };
         });
 
- 
-
+    
+        // Getting the board
         function get_board(){
             url=$("#hidden-column-get-board").data('url')
             $.get(url,null,reload_inner_wrapper,'json'), function(err){
@@ -368,7 +571,6 @@ $(document).ready(function() {
 
             url=$('#hidden-comment-add').data('url');
             id =$('#heading-card-title').data('card_id');
-
             var comment=$('#text-comment-area').val();
             data = {
                 comment : comment,
@@ -378,6 +580,7 @@ $(document).ready(function() {
             .fail(function() {
                 console.log("error");
              })
+            $("#text-comment-area").val("");
 
         });
 
@@ -412,12 +615,12 @@ $(document).ready(function() {
                      +'             <p class="card-comment-user" id="exampleModalLabel"><strong>'+comments[index].fields.user+'</strong> ('+date_commented+')</p>'
                      +'             '
                      +'             <div  id="DivisionComment-'+comments[index].pk+'" class="card-comments" name="" novalidate="">'+comments[index].fields.comment+'</div>'
-                     +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none">'+comments[index].fields.comment+'</textarea>'
+                     +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none class-input-comment">'+comments[index].fields.comment+'</textarea>'
 
 
                     if(user.current_user==comments[index].fields.user){
-                         html+='             <button data-value="'+comments[index].pk+'" id="EditComment-'+comments[index].pk+'" class="ClassEditComment float-left additional-option-comment link-style btn btn-warning">Edit</button>'
-                         +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment-'+comments[index].pk+'" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
+                         html+=' <!-- <button data-value="'+comments[index].pk+'" id="EditComment-'+comments[index].pk+'" class="ClassEditComment float-left additional-option-comment link-style btn btn-warning">Edit</button> -->'
+                         +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment-'+comments[index].pk+'" class="class-delete-comment float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
                          +'           <button data-value="'+comments[index].pk+'" name="" id="card-save-button-'+comments[index].pk+'" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>'
                          +'           <button data-value="'+comments[index].pk+'" name="" id="card-cancel-button-'+comments[index].pk+'" class="class-card-cancel-button btn btn-secondary card-button-add-comment mr-2 mt-1 float-right display-none">Cancel</button>'
                     }
@@ -429,7 +632,6 @@ $(document).ready(function() {
                             index+=1;
                              console.log('sulod');
                }
-             console.log('hi');
              $('.comment-reactor').html(html);
         }
 
@@ -482,8 +684,8 @@ $(document).ready(function() {
                     +'          </div>'
 
                      +'         <div class="right-portion-of-modal col-lg-3 col-md-3 col-sm-3">'
-                     +'             <button data-toggle="modal" data-target="#CardMemberModal"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>'
-                     +'             <button data-toggle="modal" data-target="#DueDateModal" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>'
+                     +'             <button data-toggle="modal" data-target="#CardMemberModal" id="pop-assign-members" class="btn btn-secondary card-button-invite mt-1" data-dismiss="modal">Members</button>'
+                     +'             <button data-toggle="modal" data-target="#DueDateModal" id="pop-due-date" name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Due Date</button>'
                      +'             <button  data-toggle="modal" data-target="#ArchiveCardConfirmation"  name="MessageBoxModalAlert" class="btn btn-secondary card-button-due-date mt-1" data-dismiss="modal">Archive</button>'
 
                      +'         </div>'
@@ -522,11 +724,11 @@ $(document).ready(function() {
                              +'             <p class="card-comment-user" id="exampleModalLabel"><strong>'+comments[index].fields.user+'</strong> ('+date_commented+')</p>'
                              +'             '
                              +'             <div  id="DivisionComment-'+comments[index].pk+'" class="card-comments" name="" novalidate="">'+comments[index].fields.comment+'</div>'
-                             +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none">'+comments[index].fields.comment+'</textarea>';
+                             +'             <textarea id="InputComment-'+comments[index].pk+'" class="textarea card-comments display-none class-input-comment">'+comments[index].fields.comment+'</textarea>';
 
                              if(user.current_user==comments[index].fields.user){
-                                 html+='             <button data-value="'+comments[index].pk+'" id="EditComment-'+comments[index].pk+'" class="ClassEditComment float-left additional-option-comment link-style btn btn-warning">Edit</button>'
-                                +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment-'+comments[index].pk+'" class="float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
+                                 html+='  <!--  <button data-value="'+comments[index].pk+'" id="EditComment-'+comments[index].pk+'" class="ClassEditComment float-left additional-option-comment link-style btn btn-warning">Edit</button> -->'
+                                +'             <button data-value="'+comments[index].pk+'" data-toggle="modal" data-target="#DeleteCommentModal" id="DeleteComment-'+comments[index].pk+'" class="class-delete-comment float-left additional-option-comment link-style btn btn-danger" data-dismiss="modal">Delete</button>'
                                 +'           <button data-value="'+comments[index].pk+'" name="" id="card-save-button-'+comments[index].pk+'" class="btn btn-secondary card-button-add-comment mt-1 float-right display-none">Save</button>'
                                 +'           <button data-value="'+comments[index].pk+'" name="" id="card-cancel-button-'+comments[index].pk+'" class="class-card-cancel-button btn btn-secondary card-button-add-comment mr-2 mt-1 float-right display-none">Cancel</button>'
                              }
@@ -555,7 +757,8 @@ $(document).ready(function() {
             add_card_popped_url = $('#hidden-card-add-values').val();
             $('.inner-wrap').empty();
             var a = 0;
-            html = "";            while(a < columns.length){
+            html = "";            
+            while(a < columns.length){
                 column_id = columns[a].pk;
                 column_name = columns[a].fields.name
                 html += '<div class="floatbox">' 
@@ -632,8 +835,6 @@ $(document).ready(function() {
                                       + '     </form>'
                                       + ' </div>';
                                html+=' </div>';
-
-               
                 a+=1;
             }
 

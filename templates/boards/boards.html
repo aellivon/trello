@@ -278,20 +278,19 @@
                             <div class="form-check">
                                 <label class="form-check-label">
                                 <fieldset id="checkArray">
-                                    <input name="remove_member" class="form-check-input" type="checkbox" value="{{member.id}}">
+                                  <div class="assign-division">
+                                    <input name="remove_member" id="assign-checkbox-{{member.user.id}}" class="form-check-input" type="checkbox" value="{{member.user.id}}">
                                      {{ member.user.email }}   
-                                     
-
+                                   </div>
                                 </fieldset>
                                 </label>
                             </div>
                             {% endif %}
                     {% endfor %}
                 </div>
-
               <div class="modal-footer">
-                  <span id="btnAssignRemove"> <button type="button" class="btn btn-secondary" >Assign</button></span>
-                  <span id="btnAssignCancel"> <button type="button" class="btn btn-secondary" >Cancel</button></span>
+                  <span id="btnAssignRemove" data-action="{% url 'boards:assign_members' id=board.id %}"> <button type="button" class="btn btn-secondary" >Assign</button></span>
+                  <span id="btnAssignCancel"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button></span>
               </div>
         </div>
       </div>
@@ -313,11 +312,11 @@
 
               <div class="modal-body">
                     <label for="" class="label-margin">Due Date</label>
-                    <input type="datetime-local" name="bdaytime">
+                    <input id="input-due-date" type="datetime-local">
                 </div>
 
               <div class="modal-footer">
-                <button name="DueDateModal" type="submit" class="btn btn-primary">Set Date</button>
+                <button id="set-due-date" type="submit" class="btn btn-primary">Set Date</button>
               </div>
         </form>
         </div>
@@ -341,7 +340,7 @@
                     </div>
 
                   <div class="modal-footer">
-                    <button id="archive-card-confirmation" type="submit" class="btn btn-primary">Yes</button>
+                    <button id="archive-card-confirmation" data-url="{% url 'boards:archive_card' id=board.id %}" type="submit" class="btn btn-primary">Yes</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
                   </div>
           
@@ -366,7 +365,7 @@
                     </div>
 
                   <div class="modal-footer">
-                    <button id="" type="submit" class="btn btn-primary">Yes</button>
+                    <button id="delete-comment-yes" data-url="{% url 'boards:delete_comment' %}" data-to_remove="0" type="submit" class="btn btn-primary">Yes</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
                   </div>
           
@@ -576,5 +575,7 @@
       <input id="hidden-column-update-description" type="hidden" value="{% url 'boards:update_card_description' %}" data-url="{% url 'boards:update_card_description' %}"></input>  
       <input id="hidden-comment-add" type="hidden" value="{% url 'boards:add_comment_card' %}" data-url="{% url 'boards:add_comment_card' %}"></input>  
       <input id="hidden-get-card-action" type="hidden" value="{% url 'boards:get_card_detail' %}" data-url="{% url 'boards:get_card_detail' %}"></input>  
+      <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
+      <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
       
 {% endblock %}

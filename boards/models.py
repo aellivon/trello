@@ -56,11 +56,11 @@ class Card(models.Model):
         return "{}".format(self.name)
 
 class CardMember(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    board_member = models.ForeignKey(BoardMember, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
     
     def __str__(self):
-        return "{}-{}".format(self.card.name,self.user)
+        return "{}-{}".format(self.card.name,self.board_member.user)
 
 class CardComment(models.Model):
     user =models.ForeignKey(User,on_delete=models.CASCADE)
