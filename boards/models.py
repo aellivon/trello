@@ -52,7 +52,7 @@ class Column(models.Model):
     """
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     name = models.TextField()
-    position = models.IntegerField()
+    position = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
 
     def __str__(self):

@@ -63,7 +63,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
         )
 
 
-class BoardView(LoginRequiredMixin, TemplateView):
+class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
     """
         Handling the upper part of the board and initialization of 
         the board itself.
@@ -309,7 +309,7 @@ class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View
         name = self.request.POST.get('name')
         column_id = self.request.POST.get('id')
         column = get_object_or_404(Column,pk=column_id)
-        new_card = Card(name=name,column=column)
+        new_card = Card(name=name,column=column, position=0)
         new_card.save()
         data = self.return_board()
         return JsonResponse(data)
