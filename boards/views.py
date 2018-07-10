@@ -397,9 +397,11 @@ class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
     def post(self, *args, **kwargs):
         card_id = self.request.POST.get('card_id')
         card = get_object_or_404(Card,pk=card_id)
-        parsed_date = dateutil.parser.parse(self.request.POST.get('due_date'))
+        try:
+            parsed_date = dateutil.parser.parse(self.request.POST.get('due_date'))
+        except Exception as e:
+            return HttpResponse(e)
 
-        print (card.name)
         card.due_date = parsed_date
         card.save()
         return HttpResponse('success!')

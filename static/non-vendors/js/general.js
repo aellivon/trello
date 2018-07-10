@@ -312,15 +312,17 @@ $(document).ready(function() {
                 console.log(this.value);
                 card_member = JSON.parse(data.card_member);
                 var count = 0;
+                var checked = false;
                 while(count < card_member.length){
                     if(card_member[count].fields.board_member == this.value){
                         $(this).prop('checked', true);
-                    }else{
-                        $(this).prop('checked', false);
+                        checked = true;
                     }
                     count+=1;
                 }
-                
+                if(checked==false){
+                        $(this).prop('checked', false);
+                }
             });
         }
 
@@ -397,6 +399,8 @@ $(document).ready(function() {
                 console.log(to_set);
                 $("#input-due-date").val(to_set);
                 
+            }else{
+                 $("#input-due-date").val(null);
             }
         }
 
