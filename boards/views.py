@@ -3,6 +3,7 @@ from .models import User
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, View
 from .models import Board, BoardMember, Referral, Column, Card, CardComment, CardMember
+from activity.models import Activity
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
 from django.http import (HttpResponse, HttpResponseRedirect,
@@ -35,6 +36,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
         context = self.form()
         username = self.kwargs.get('username')
         user = get_object_or_404(User,username=username)
+        # self.request.session['user'] = user.id
         boards = BoardMember.objects.filter(
             user=user,board__archived=False,is_confirmed=True).order_by('-pk')
         return render(self.request, self.template_name,
@@ -84,6 +86,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
         access = get_object_or_404(BoardMember,user__username=username,
             is_confirmed=True,board__id=board_id)
         board = get_object_or_404(Board,pk=board_id)
+        self.request.session['board'] = board.id # store to session
         board_member = BoardMember.objects.filter(
             board__id=board_id)
         referral = Referral.objects.filter(
@@ -245,6 +248,7 @@ class GetBoardDetails(LoginRequiredMixin, BoardPermissionMixIn , AJAXBoardMixIn,
         data = self.return_board()
         return JsonResponse(data)
 
+
 class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
     """
         This class adds a column in the board and refreshses the board itself.
@@ -262,10 +266,20 @@ class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vi
             to_add_position =   maximum_exists + 1
         new_column = Column(board=board,name=title,position=to_add_position)
         new_column.save()
+
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "added",
+            from_list = new_column,
+            board_name = board 
+        )
+
         data = self.return_board()
         # needs to be changed
         return JsonResponse(data)
-
 
 
 class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
@@ -279,6 +293,17 @@ class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn,
         column=get_object_or_404(Column,id=to_update_id)
         column.name = title
         column.save()
+
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "updated",
+            from_list = column,
+            board_name = board 
+        )
+
         data = self.return_board()
         # needs to be changed
         return JsonResponse(data)
@@ -294,6 +319,17 @@ class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn
         column=get_object_or_404(Column,id=to_update_id)
         column.archived = True
         column.save()
+
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "archived",
+            from_list = column,
+            board_name = board 
+        )
+
         data = self.return_board()
         # needs to be changed
         return JsonResponse(data)
@@ -311,8 +347,23 @@ class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View
         column = get_object_or_404(Column,pk=column_id)
         new_card = Card(name=name,column=column, position=0)
         new_card.save()
+        print ('hello')
+        
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "added",
+            card = new_card,
+            second_action = "on",
+            to_list = column,
+            board_name = board 
+        )
+
         data = self.return_board()
         return JsonResponse(data)
+
 
 class GetCardDetails(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
     """
@@ -322,6 +373,7 @@ class GetCardDetails(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vi
     def get(self, *args, **kwargs):
         data=self.return_card()
         return JsonResponse(data)
+
 
 class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
     """
@@ -334,8 +386,20 @@ class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, V
         card = get_object_or_404(Card, pk=card_id)
         card.name = name
         card.save()
+
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "updated",
+            card = card,
+            board_name = board 
+        )
+
         data=self.return_card()
         return JsonResponse(data)
+
 
 class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
     """
@@ -347,9 +411,21 @@ class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
         card_id = self.request.POST.get('card_id')
         card = get_object_or_404(Card, pk=card_id)
         card.description = description
+
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "updated",
+            card = card,
+            second_action = "description",
+            comment = description,
+            board_name = board 
+        )
+
         card.save()
         return HttpResponse('success!')
-
 
 
 class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
@@ -365,8 +441,21 @@ class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vi
             card = get_object_or_404(Card, pk=card_id)
             new_comment = CardComment(card=card, user=self.request.user, comment=comment)
             new_comment.save()
+
+            # activity stream
+            user = User.objects.get(id=self.request.session['user'])
+            board = Board.objects.get(id=self.request.session['board'])
+            Activity.objects.create(
+                user = user,
+                action = "on",
+                card = card,
+                comment = comment,
+                board_name = board 
+            )
+        
         data=self.return_card()
         return JsonResponse(data)
+
 
 class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
     """
@@ -379,6 +468,7 @@ class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
         CardComment.objects.get(pk=comment_id).delete()
         data=self.return_card()
         return JsonResponse(data)
+
 
 class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
     """
@@ -395,12 +485,27 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
             new_card_member= CardMember(board_member=board_member,card=card_instance)
             new_card_member.save()
 
+
+            # activity stream
+            user = User.objects.get(id=self.request.session['user'])
+            board = Board.objects.get(id=self.request.session['board'])
+            Activity.objects.create(
+                user = user,
+                action = "added",
+                added_user = board_member.user,
+                second_action = "to",
+                to_card = card_instance,
+                board_name = board 
+            )
+
+
         for element in not_selected:
             CardMember.objects.filter(board_member__user__id=element).delete()
 
-        
+
         data=self.return_card()
         return JsonResponse(data)
+
 
 class GetMembers(LoginRequiredMixin, BoardPermissionMixIn, View):
     """
@@ -414,6 +519,7 @@ class GetMembers(LoginRequiredMixin, BoardPermissionMixIn, View):
         serialized_card_member = serializers.serialize('json', card_member)
         data = {'card_member' : serialized_card_member}
         return JsonResponse(data)
+
 
 class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
     """
@@ -442,6 +548,7 @@ class DueDate(LoginRequiredMixin, BoardPermissionMixIn, View):
         card.save()
         return HttpResponse('success!')
 
+
 class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
     """
         This class archives the card that is currently selected.
@@ -453,6 +560,17 @@ class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View)
         card = get_object_or_404(Card, pk=card_id)
         card.archived = True
         card.save()
+
+        # activity stream
+        user = User.objects.get(id=self.request.session['user'])
+        board = Board.objects.get(id=self.request.session['board'])
+        Activity.objects.create(
+            user = user,
+            action = "archived",
+            card = card,
+            board_name = board 
+        )
+
         data = self.return_board()
         return JsonResponse(data)
 
@@ -518,4 +636,3 @@ class UserValidationView(TemplateView):
                     {'form':form, 'email' : email, 'board': board , 'success': True , 'account' : False}
                 ) 
         return HttpResponseBadRequest()
-

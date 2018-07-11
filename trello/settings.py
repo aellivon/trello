@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'annoying',
     'users',
-    'boards'
+    'boards',
+    'activity'
 ]
 
 MIDDLEWARE = [

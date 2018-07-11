@@ -1,7 +1,13 @@
 
 $(document).ready(function() {
 
-      
+        // Drag and drop mechanics
+        $('.dragging-29').draggable({
+            helper: 'clone',
+            start  : function(event, ui){
+                $(ui.helper).addClass("ui-helper");
+            }
+        });
         // using jQuery
         function getCookie(name) {
             var cookieValue = null;

@@ -15,10 +15,19 @@ body {
   display:flex;
 }
 
-..modal {
+.ui-helper {
+    width: 28% !important;
+}
+
+.modal {
   overflow-y:auto;
 }
 
+.remove_list{
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
 
 .textarea {
   padding: 10px;
@@ -289,7 +298,6 @@ hr.border{
 .error-box-member-invite{
 	margin-top: 10px;
 }
-
 .box-board{
 
 	margin-bottom: 15px;
@@ -302,8 +310,11 @@ hr.border{
 }
 
 
-.right-element-settings{
+.custom-row{
+	width: 100%;
+	position: fixed;
 }
+
 
 .box-board-has-content{
 	background-color: #323232;
@@ -505,5 +516,20 @@ hr.border{
 
 #label-error{
 	margin-bottom: 10px;
+}
+
+.activity-body{
+	margin-left: 20%;
+	margin-right: 20%;
+	margin-top: 10%;
+}
+
+.activity-content{
+	word-spacing: 3px;
+}
+
+.activity-footer{
+	font-size:12px;
+	margin-right:10px;
 }
 

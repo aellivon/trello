@@ -523,7 +523,7 @@
                    
                 {% for card in cards %}
                     {% if card.column == column %}
-                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
+                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor dragging-{{card.id}}" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
                         <center>
                         <label data-value="{{ column.id }}" class=" form-control card-column-class non-editable-add-card">{{card.name}}</label>
                         </center>

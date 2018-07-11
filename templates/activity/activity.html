@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block body %}
+	{% include 'nav_bar.html' %}
+
+	<div class="activity-body">
+		<strong>📕 Activity</strong>
+		<hr>
+		{% for activity in activities %} 
+		
+		<div class="row activity-content">
+				🅰️
+		{{activity.user}}
+	
+		{{activity.action}}
+		
+		{% if activity.added_user %}
+			{{activity.added_user}}
+		{% endif %}
+		
+		{% if activity.from_list %}
+			{{activity.from_list}}
+		{% endif %}
+		
+		{% if activity.card %}
+			{{activity.card}}
+		{% endif %}
+
+		{% if activity.second_action %}
+			{{activity.second_action}}
+		{% endif %}
+		
+		{% if activity.to_list %}
+			{{activity.to_list}}
+		{% endif %}
+		
+		{% if activity.to_card %}
+			{{activity.to_card}}
+		{% endif %}
+
+		
+		</div>
+		<div class="row activity-footer">
+	
+		{% if activity.action == 'on' %}
+			{% if activity.comment %}
+			comment - 
+				{{activity.comment}}
+			{% endif %}
+		{% elif activity.action == 'updated' %}
+			{% if activity.comment %}
+			description -
+				{{activity.comment}}
+			{% endif %}
+		{% endif %}
+
+
+
+		
+		</div>
+		<div class="row activity-footer">
+		
+		{% if  activity.modified %}
+			{{activity.modified}}
+		{% endif %}
+	
+		{% if  activity.board_name %}
+			- on board {{activity.board_name}}🛡
+		{% endif %}	
+		
+		
+		</div>
+	
+	
+		
+	
+		<hr>
+		{% endfor %}
+	</div>
+		
+{% endblock %}
