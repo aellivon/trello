@@ -7,8 +7,13 @@ from boards.models import Board,Column,Card
 class Activity(models.Model):
     """
         models for activity
+        this fields forms a sttring if they have values
     """
-    CHOICES = (('moved', 'moved'), ('added', 'added'), ('on','on'), ('archived','archived'),('to','to'), ('updated','updated'))
+    CHOICES = (
+        ('moved', 'moved'), ('added', 'added'), ('on','on'),
+        ('archived','archived'),('to','to'), ('updated','updated'),
+        ('transferred','transferred')
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="initial_user")
     action = models.CharField(max_length=25,choices=CHOICES)
     added_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_user",blank=True,null=True)

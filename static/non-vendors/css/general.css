@@ -16,7 +16,7 @@ body {
 }
 
 .ui-helper {
-    width: 28% !important;
+    opacity: 0.90;
 }
 
 .modal {

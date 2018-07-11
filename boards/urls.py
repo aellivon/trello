@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (IndexView, BoardView, UserValidationView,
  AddColumnView, UpdateColumnView, ArchiveColumnView, AddCardView, GetCardDetails,
  UpdateCardTitle, GetBoardDetails, UpdateCardDescription, AddCommentCard, DeleteComment,
- AssignMembers, GetMembers, DueDate, ArhiveCard)
+ AssignMembers, GetMembers, DueDate, ArhiveCard, TransferCard)
 
 
 app_name = 'boards'
@@ -25,5 +25,6 @@ urlpatterns = [
      path('get/members/<int:id>', GetMembers.as_view(), name="get_members"),
      path('manipulate/due_date/<int:id>', DueDate.as_view(), name="due_date"),
      path('archived/card/<int:id>', ArhiveCard.as_view(), name="archive_card"),
+     path('transfer/card/<int:id>', TransferCard.as_view(), name="transfer_cards"),
 
 ]

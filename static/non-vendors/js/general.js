@@ -2,12 +2,35 @@
 $(document).ready(function() {
 
         // Drag and drop mechanics
-        $('.dragging-29').draggable({
-            helper: 'clone',
-            start  : function(event, ui){
-                $(ui.helper).addClass("ui-helper");
-            }
-        });
+        function init_drag_and_drop_mechanics(){
+            $('.card-reactor').draggable({
+                helper: 'clone',
+                containment: ".inner-wrap",
+                start  : function(event, ui){
+                    $(ui.helper).addClass("ui-helper");
+                }
+            });
+
+            $('.transferable-columns').droppable({
+                tolerance: "touch",
+                drop: function(event, ui){
+                    var card_id= $(ui.draggable).data("card_id");
+                    var to_column_id = $(this).data("value");
+                    var from_column_id = $(ui.draggable).data('value');
+                    var url = $("#hidden-transfer-cards").data("url");
+                    data = {
+                        card_id : card_id,
+                        to_column_id : to_column_id,
+                        from_column_id : from_column_id
+                    }
+                    $.post(url,data,reload_inner_wrapper,'json'), function(err){
+
+                    };
+                }
+            });
+        }
+
+        init_drag_and_drop_mechanics();
         // using jQuery
         function getCookie(name) {
             var cookieValue = null;
@@ -321,7 +344,10 @@ $(document).ready(function() {
                 var count = 0;
                 var checked = false;
                 while(count < card_member.length){
+                    console.log(card_member);
+                    console.log(card_member[count].fields.board_member);
                     if(card_member[count].fields.board_member == this.value){
+
                         $(this).prop('checked', true);
                         checked = true;
                     }
@@ -360,8 +386,6 @@ $(document).ready(function() {
             e.preventDefault();
             card_id =$('#heading-card-title').data('card_id');
             url=$(this).data('url');
-            console.log(url);
-            console.log(card_id);
             data = {
                 card_id : card_id
             }
@@ -766,13 +790,15 @@ $(document).ready(function() {
             archived_popped_url = $('#hidden-column-archive-values').val();
             update_popped_url = $('#hidden-column-update-values').val();
             add_card_popped_url = $('#hidden-card-add-values').val();
+            transfer_popped_url = $("#hidden-transfer-cards").data("url");
+            console.log(transfer_popped_url);
             $('.inner-wrap').empty();
             var a = 0;
             html = "";            
             while(a < columns.length){
                 column_id = columns[a].pk;
                 column_name = columns[a].fields.name
-                html += '<div class="floatbox">' 
+                html += '<div class="floatbox transferable-columns" data-value="'+column_id+'" data-url="'+transfer_popped_url+'">  ' 
                          + '<div id="existing-label-'+column_id+'"' 
                        + ' class= "existing-reactor" data-value="'+column_id+'"> '
                        + ' <label data-value="'+column_id+'" '
@@ -862,6 +888,8 @@ $(document).ready(function() {
                   +'</form>'
               +'</div>';
             $('.inner-wrap').html(html);
+
+            init_drag_and_drop_mechanics();
         }
 
         

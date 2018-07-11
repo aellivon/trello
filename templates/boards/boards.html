@@ -279,7 +279,7 @@
                                 <label class="form-check-label">
                                 <fieldset id="checkArray">
                                   <div class="assign-division">
-                                    <input name="remove_member" id="assign-checkbox-{{member.user.id}}" class="form-check-input" type="checkbox" value="{{member.user.id}}">
+                                    <input name="remove_member" id="assign-checkbox-{{member.user.id}}" class="form-check-input" type="checkbox" value="{{member.id}}">
                                      {{ member.user.email }}   
                                    </div>
                                 </fieldset>
@@ -504,7 +504,7 @@
     <div class ="outer-wrap">
         <div class="inner-wrap">
             {% for column in columns %}
-            <div class="floatbox">
+            <div class="floatbox transferable-columns" data-value="{{ column.id }}">
               <!-- Column name -->
                    <div id="existing-label-{{column.id}}" class="existing-reactor" data-value="{{ column.id }}">
                       <label data-value="{{ column.id }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
@@ -523,7 +523,7 @@
                    
                 {% for card in cards %}
                     {% if card.column == column %}
-                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor dragging-{{card.id}}" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
+                      <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
                         <center>
                         <label data-value="{{ column.id }}" class=" form-control card-column-class non-editable-add-card">{{card.name}}</label>
                         </center>
@@ -577,5 +577,7 @@
       <input id="hidden-get-card-action" type="hidden" value="{% url 'boards:get_card_detail' id=board.id %}" data-url="{% url 'boards:get_card_detail' id=board.id %}"></input>  
       <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
       <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
+      <input id="hidden-transfer-cards" type="hidden" data-url="{% url 'boards:transfer_cards' id=board.id %}"></input>
+      
       
 {% endblock %}

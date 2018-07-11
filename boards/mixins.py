@@ -59,7 +59,7 @@ class BoardPermissionMixIn():
         board_id = self.kwargs.get('id')
         # Permission Denied if 404
         exists = get_object_or_None(
-            BoardMember, board__id=board_id,user__pk=self.request.user.id)
+            BoardMember, board__id=board_id, user__pk=self.request.user.id)
         if not exists:
             return HttpResponseBadRequest()
 

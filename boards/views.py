@@ -468,6 +468,43 @@ class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
         return JsonResponse(data)
 
 
+class TransferCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
+    """
+        This catches the drag and drop of a user
+    """
+    login_url = reverse_lazy('users:log_in')
+    def post(self, *args, **kwargs):
+        card_id = self.request.POST.get('card_id')
+        card = get_object_or_404(Card,pk=card_id)
+        column_instance = get_object_or_404(
+            Column,pk=self.request.POST.get('to_column_id')
+        )
+        card.column = column_instance
+        card.save()
+
+        from_column_instance = get_object_or_404(
+            Column, pk=self.request.POST.get('from_column_id')
+        )
+
+        # activity stream
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
+        Activity.objects.create(
+            user = user,
+            action = "transferred",
+            card = card,
+            from_list = from_column_instance,
+            to_list = column_instance,
+            board_name = board 
+        )
+
+        data=self.return_board()
+        return JsonResponse(data)
+        
+
+      
+
+
 class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, View):
     """
         This class assigns members to a card. 
@@ -479,7 +516,9 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
         card_id = self.request.POST.get('card_id')
         card_instance = get_object_or_404(Card,pk=card_id)
         for element in selected:
-            board_member = get_object_or_404(BoardMember,user__pk=element)
+            board_member = get_object_or_404(
+                BoardMember, pk=element
+            )
             new_card_member= CardMember(board_member=board_member,card=card_instance)
             new_card_member.save()
 
@@ -498,7 +537,7 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
 
 
         for element in not_selected:
-            CardMember.objects.filter(board_member__user__id=element).delete()
+            CardMember.objects.filter(board_member__pk=element).delete()
 
 
         data=self.return_card()

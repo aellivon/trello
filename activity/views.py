@@ -18,16 +18,16 @@ class ActivityView(LoginRequiredMixin,TemplateView):
     """
     # Reverse lazy is needed since this code is before the Url coniguration
     # is loaded
-    activity_url = reverse_lazy('users:log_in')
+    login_url = reverse_lazy('users:log_in')
     template_name = "activity/activity.html"
 
     def get(self, *args,** kwargs):
         context = {}
-        username = self.kwargs.get('user')
-        user = get_object_or_404(User,username=username)
-        activity = Activity.objects.filter(Q(user=user) | Q(added_user=user)).order_by('-modified')
+        user = self.request.user
+        activity = Activity.objects.filter(
+            Q(user=user) | Q(added_user=user)).order_by('-modified')
 
-        context={'activities':activity, 'current_user' : username}
+        context={'activities':activity, 'current_user' : self.request.user.username}
 
         return render(self.request, self.template_name,context)
 
