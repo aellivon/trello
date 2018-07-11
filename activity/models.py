@@ -5,6 +5,9 @@ from users.models import User
 from boards.models import Board,Column,Card
 
 class Activity(models.Model):
+    """
+        models for activity
+    """
     CHOICES = (('moved', 'moved'), ('added', 'added'), ('on','on'), ('archived','archived'),('to','to'), ('updated','updated'))
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="initial_user")
     action = models.CharField(max_length=25,choices=CHOICES)
@@ -16,7 +19,7 @@ class Activity(models.Model):
     to_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="to_list",blank=True,null=True)
     to_card =  models.ForeignKey(Card,on_delete=models.CASCADE, related_name="to_card",blank=True,null=True)
     board_name = models.ForeignKey(Board, on_delete=models.CASCADE) 
-    modified = models.DateTimeField(default=datetime.now, blank=True)
+    modified = models.DateTimeField(default=datetime.now)
     
     def __str__(self):
         return "{}".format(self.user) 

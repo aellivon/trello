@@ -36,7 +36,6 @@ class IndexView(LoginRequiredMixin,TemplateView):
         context = self.form()
         username = self.kwargs.get('username')
         user = get_object_or_404(User,username=username)
-        # self.request.session['user'] = user.id
         boards = BoardMember.objects.filter(
             user=user,board__archived=False,is_confirmed=True).order_by('-pk')
         return render(self.request, self.template_name,
@@ -86,7 +85,6 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
         access = get_object_or_404(BoardMember,user__username=username,
             is_confirmed=True,board__id=board_id)
         board = get_object_or_404(Board,pk=board_id)
-        self.request.session['board'] = board.id # store to session
         board_member = BoardMember.objects.filter(
             board__id=board_id)
         referral = Referral.objects.filter(
@@ -268,8 +266,8 @@ class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vi
         new_column.save()
 
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "added",
@@ -295,8 +293,8 @@ class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn,
         column.save()
 
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "updated",
@@ -321,8 +319,8 @@ class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn
         column.save()
 
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "archived",
@@ -350,8 +348,8 @@ class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View
         print ('hello')
         
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "added",
@@ -388,8 +386,8 @@ class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, V
         card.save()
 
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "updated",
@@ -413,8 +411,8 @@ class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
         card.description = description
 
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "updated",
@@ -443,8 +441,8 @@ class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vi
             new_comment.save()
 
             # activity stream
-            user = User.objects.get(id=self.request.session['user'])
-            board = Board.objects.get(id=self.request.session['board'])
+            user = User.objects.get(id=self.request.user.id)
+            board = Board.objects.get(id=self.kwargs.get('id'))
             Activity.objects.create(
                 user = user,
                 action = "on",
@@ -487,11 +485,11 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
 
 
             # activity stream
-            user = User.objects.get(id=self.request.session['user'])
-            board = Board.objects.get(id=self.request.session['board'])
+            user = User.objects.get(id=self.request.user.id)
+            board = Board.objects.get(id=self.kwargs.get('id'))
             Activity.objects.create(
                 user = user,
-                action = "added",
+                action = "assigned",
                 added_user = board_member.user,
                 second_action = "to",
                 to_card = card_instance,
@@ -562,8 +560,8 @@ class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View)
         card.save()
 
         # activity stream
-        user = User.objects.get(id=self.request.session['user'])
-        board = Board.objects.get(id=self.request.session['board'])
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
             action = "archived",
