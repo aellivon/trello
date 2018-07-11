@@ -36,12 +36,6 @@ class Activity(models.Model):
         User, on_delete=models.CASCADE, related_name="added_user", blank=True,
         null=True
     )
-    # added_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_user",blank=True,null=True)
-    # from_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="from_list",blank=True,null=True)
-    # comment = models.TextField(blank=True,null=True)
-    # second_action =  models.CharField(max_length=25,choices=CHOICES, blank=True,null=True)
-    # to_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="to_list",blank=True,null=True)
-    # to_card =  models.ForeignKey(Card,on_delete=models.CASCADE, related_name="to_card",blank=True,null=True)
     
     modified = models.DateTimeField(default=datetime.now)
     

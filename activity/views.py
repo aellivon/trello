@@ -14,7 +14,7 @@ from boards.models import BoardMember
 
 class ActivityView(LoginRequiredMixin,TemplateView):
     """
-        Views for the Activity Page
+        Views for the User Activity Page
     """
     # Reverse lazy is needed since this code is before the Url coniguration
     # is loaded
