@@ -8,38 +8,31 @@
 		<strong>📕 Activity</strong>
 		<hr>
 		{% for activity in activities %} 
-		
+
 		<div class="row activity-content">
 				🅰️
 		{{activity.user}}
-	
-		{{activity.action}}
 		
-		{% if activity.added_user %}
-			{{activity.added_user}}
-		{% endif %}
-		
-		{% if activity.from_list %}
-			{{activity.from_list}}
-		{% endif %}
-		
-		{% if activity.card %}
-			{{activity.card}}
-		{% endif %}
-
-		{% if activity.second_action %}
-			{{activity.second_action}}
-		{% endif %}
-		
-		{% if activity.to_list %}
-			{{activity.to_list}}
-		{% endif %}
-		
-		{% if activity.to_card %}
-			{{activity.to_card}}
+		{% if activity.action == "added_list" %}
+			added '{{ activity.first_list }}' on '{{ activity.board.name }}'
+		{% elif activity.action == "update_list" %}
+			updated '{{ activity.first_list }}' on '{{ activity.board.name }}'
+		{% elif activity.action == "archived_list" %}
+			archived '{{ activity.first_list }}' on '{{ activity.board.name }}'
+		{% elif activity.action == "added_card" %}
+			added '{{ activity.first_card }}' on '{{ activity.first_list }}'
+		{% elif activity.action == "updated_card_title" %}
+			added '{{ activity.first_card }}' title on '{{ activity.first_list }}'
+		{% elif activity.action == "updated_card_description" %}
+			added '{{ activity.first_card }}' description on '{{ activity.first_list }}'
+		{% elif activity.action == "add_comment" %}
+			added a comment in '{{activity.first_card}}'
+		{% elif activity.action == "deleted_comment" %}
+			deleted a comment in '{{activity.first_card}}'
+		{% elif activity.action == "transferred_card" %}
+			transferred '{{activity.first_card}}'' from '{{activity.first_list}}'' to '{{activity.second_list}}''
 		{% endif %}
 
-		
 		</div>
 		<div class="row activity-footer">
 	

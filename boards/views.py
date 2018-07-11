@@ -270,9 +270,9 @@ class AddColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vi
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "added",
-            from_list = new_column,
-            board_name = board 
+            action = "added_list",
+            first_list = new_column,
+            board = board 
         )
 
         data = self.return_board()
@@ -297,9 +297,9 @@ class UpdateColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn,
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "updated",
-            from_list = column,
-            board_name = board 
+            action = "update_list",
+            first_list = column,
+            board = board 
         )
 
         data = self.return_board()
@@ -323,9 +323,9 @@ class ArchiveColumnView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "archived",
-            from_list = column,
-            board_name = board 
+            action = "archived_list",
+            first_list = column,
+            board = board 
         )
 
         data = self.return_board()
@@ -352,11 +352,10 @@ class AddCardView(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "added",
-            card = new_card,
-            second_action = "on",
-            to_list = column,
-            board_name = board 
+            action = "added_card",
+            first_card = new_card,
+            first_list = column,
+            board = board 
         )
 
         data = self.return_board()
@@ -390,9 +389,9 @@ class UpdateCardTitle(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, V
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "updated",
+            action = "updated_card_title",
             card = card,
-            board_name = board 
+            board = board 
         )
 
         data=self.return_card()
@@ -415,11 +414,9 @@ class UpdateCardDescription(LoginRequiredMixin, BoardPermissionMixIn, View):
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "updated",
-            card = card,
-            second_action = "description",
-            comment = description,
-            board_name = board 
+            action = "updated_card_description",
+            first_card = card,
+            board = board 
         )
 
         card.save()
@@ -445,10 +442,9 @@ class AddCommentCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vi
             board = Board.objects.get(id=self.kwargs.get('id'))
             Activity.objects.create(
                 user = user,
-                action = "on",
-                card = card,
-                comment = comment,
-                board_name = board 
+                action = "add_comment",
+                first_card = card,
+                board = board 
             )
         
         data=self.return_card()
@@ -463,9 +459,22 @@ class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
     login_url = reverse_lazy('users:log_in')
     def post(self, *args, **kwargs):
         comment_id = self.request.POST.get('comment_id')
-        CardComment.objects.get(pk=comment_id).delete()
+        card_comment=CardComment.objects.get(pk=comment_id)
+        card = card_comment.card
+        card_comment.delete()
+
+        user = User.objects.get(id=self.request.user.id)
+        board = Board.objects.get(id=self.kwargs.get('id'))
+        Activity.objects.create(
+            user = user,
+            action = "deleted_comment",
+            first_card = card,
+            board = board 
+        )
+
         data=self.return_card()
         return JsonResponse(data)
+        
 
 
 class TransferCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
@@ -491,11 +500,11 @@ class TransferCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vie
         board = Board.objects.get(id=self.kwargs.get('id'))
         Activity.objects.create(
             user = user,
-            action = "transferred",
-            card = card,
-            from_list = from_column_instance,
-            to_list = column_instance,
-            board_name = board 
+            action = "transferred_card",
+            first_card = card,
+            first_list = from_column_instance,
+            second_list = column_instance,
+            board = board 
         )
 
         data=self.return_board()
@@ -528,11 +537,10 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
             board = Board.objects.get(id=self.kwargs.get('id'))
             Activity.objects.create(
                 user = user,
-                action = "assigned",
+                action = "assign_member",
                 added_user = board_member.user,
-                second_action = "to",
                 to_card = card_instance,
-                board_name = board 
+                board = board 
             )
 
 
@@ -605,7 +613,7 @@ class ArhiveCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View)
             user = user,
             action = "archived",
             card = card,
-            board_name = board 
+            board = board 
         )
 
         data = self.return_board()

@@ -8,22 +8,41 @@ class Activity(models.Model):
     """
         models for activity
         this fields forms a sttring if they have values
+        not all values is required in this model
     """
     CHOICES = (
-        ('moved', 'moved'), ('added', 'added'), ('on','on'),
-        ('archived','archived'),('to','to'), ('updated','updated'),
-        ('transferred','transferred')
+        ('added_list', 'added_list'), ('update_list', 'update_list'),
+        ('archived_list','archived_list'), ('added_card','added_card'),
+        ('updated_card_title','updated_card_title'),
+        ('updated_card_description','updated_card_description'),
+        ('add_comment','add_comment'),('deleted_comment','deleted_comment'),
+        ('transferred_card','transferred_card'), ('assign_member', 'assign_member')
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="initial_user")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="initial_user"
+    )
+    board = models.ForeignKey(Board, on_delete=models.CASCADE) 
     action = models.CharField(max_length=25,choices=CHOICES)
-    added_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_user",blank=True,null=True)
-    from_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="from_list",blank=True,null=True)
-    card =  models.ForeignKey(Card,on_delete=models.CASCADE, related_name="card",blank=True,null=True)
-    comment = models.TextField(blank=True,null=True)
-    second_action =  models.CharField(max_length=25,choices=CHOICES, blank=True,null=True)
-    to_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="to_list",blank=True,null=True)
-    to_card =  models.ForeignKey(Card,on_delete=models.CASCADE, related_name="to_card",blank=True,null=True)
-    board_name = models.ForeignKey(Board, on_delete=models.CASCADE) 
+    first_list = models.ForeignKey(
+        Column,on_delete=models.CASCADE, related_name="first_list",blank=True,null=True
+    )
+    first_card =  models.ForeignKey(
+        Card,on_delete=models.CASCADE, related_name="card",blank=True,null=True
+    )
+    second_list = models.ForeignKey(
+        Column,on_delete=models.CASCADE, related_name="second_list",blank=True,null=True
+    )
+    added_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="added_user", blank=True,
+        null=True
+    )
+    # added_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_user",blank=True,null=True)
+    # from_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="from_list",blank=True,null=True)
+    # comment = models.TextField(blank=True,null=True)
+    # second_action =  models.CharField(max_length=25,choices=CHOICES, blank=True,null=True)
+    # to_list = models.ForeignKey(Column,on_delete=models.CASCADE, related_name="to_list",blank=True,null=True)
+    # to_card =  models.ForeignKey(Card,on_delete=models.CASCADE, related_name="to_card",blank=True,null=True)
+    
     modified = models.DateTimeField(default=datetime.now)
     
     def __str__(self):
