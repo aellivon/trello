@@ -1,7 +1,9 @@
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
-from .models import Column, Card, CardComment, BoardMember
+from .models import Column, Card, CardComment, BoardMember, Board
+from users.models import User
+from activity.models import Activity
 import json as simplejson
 from django.core import serializers
 from django.shortcuts import get_object_or_404
@@ -36,7 +38,7 @@ class AJAXCardMixIn():
         # brackets are needed since they are single objects
         card = [get_object_or_404(Card,pk=card_id)]
         card_comments = CardComment.objects.filter(
-            card__id=card_id).select_related('user').order_by('-pk')
+            card__id=card_id, archived=False).select_related('user').order_by('-pk')
         current_user = {'current_user' : self.request.user.username}
         serialized_data_cards = serializers.serialize('json', card)
         if card_comments:
@@ -64,3 +66,4 @@ class BoardPermissionMixIn():
             return HttpResponseBadRequest()
 
         return super().dispatch(request, *args, **kwargs)
+

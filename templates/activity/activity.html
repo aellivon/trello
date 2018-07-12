@@ -1,56 +1,23 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
+{% load staticfiles activity_stream %}
 
 {% block body %}
 	{% include 'nav_bar.html' %}
 
 	<div class="activity-body">
-		<strong>📕 Activity</strong>
+		<strong>📕 User Activity</strong>
 		<hr>
 		{% for activity in activities %} 
 
 		<div class="row activity-content">
 				🅰️
-		{{activity.user}}
+		"{{activity.user}}"
 		
-		{% if activity.action == "added_list" %}
-			added '{{ activity.first_list }}' on '{{ activity.board.name }}'
-		{% elif activity.action == "update_list" %}
-			updated '{{ activity.first_list }}' on '{{ activity.board.name }}'
-		{% elif activity.action == "archived_list" %}
-			archived '{{ activity.first_list }}' on '{{ activity.board.name }}'
-		{% elif activity.action == "added_card" %}
-			added '{{ activity.first_card }}' on '{{ activity.first_list }}'
-		{% elif activity.action == "updated_card_title" %}
-			added '{{ activity.first_card }}' title on '{{ activity.first_list }}'
-		{% elif activity.action == "updated_card_description" %}
-			added '{{ activity.first_card }}' description on '{{ activity.first_list }}'
-		{% elif activity.action == "add_comment" %}
-			added a comment in '{{activity.first_card}}'
-		{% elif activity.action == "deleted_comment" %}
-			deleted a comment in '{{activity.first_card}}'
-		{% elif activity.action == "transferred_card" %}
-			transferred '{{activity.first_card}}'' from '{{activity.first_list}}'' to '{{activity.second_list}}''
-		{% endif %}
+		{{activity.action}} 
 
-		</div>
-		<div class="row activity-footer">
-	
-		{% if activity.action == 'on' %}
-			{% if activity.comment %}
-			comment - 
-				{{activity.comment}}
-			{% endif %}
-		{% elif activity.action == 'updated' %}
-			{% if activity.comment %}
-			description -
-				{{activity.comment}}
-			{% endif %}
-		{% endif %}
+		{{ activity|activity_stream_heading }}
 
 
-
-		
 		</div>
 		<div class="row activity-footer">
 		

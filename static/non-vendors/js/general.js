@@ -230,7 +230,38 @@ $(document).ready(function() {
         $(document).on("click", "#heading-card-title", function(){
           $("#heading-card-title").addClass('display-none');
           $("#input-card-title").removeClass('display-none');
+          $("#card-button-update-title").removeClass('display-none');
+          $("#card-button-cancel-title").removeClass('display-none');
           $("#input-card-title").focus();
+        });
+
+        
+        $(document).on("click", "#card-button-cancel-title", function(){
+          $("#heading-card-title").removeClass('display-none');
+          $("#input-card-title").addClass('display-none');
+          $("#card-button-update-title").addClass('display-none');
+          $("#card-button-cancel-title").addClass('display-none');
+        });
+
+        $(document).on("click", "#card-button-update-title", function(){
+            $("#heading-card-title").removeClass('display-none');
+            $("#input-card-title").addClass('display-none');
+            $("#card-button-update-title").addClass('display-none');
+            $("#card-button-cancel-title").addClass('display-none');
+
+            url=$('#heading-card-title').attr('action');
+            id =$('#heading-card-title').data('card_id');
+            var title=$('#input-card-title').val();
+            if (title){
+                data = {
+                    title : title,
+                    card_id : id
+                }
+
+                $.post(url,data,reload_card_title,'json'), function(err){
+                    console.log("error");
+                };
+            }
         });
 
         $(document).on("blur", "#input-card-title", function(){
@@ -543,23 +574,6 @@ $(document).ready(function() {
         });
 
 
-        // Changing text card title action
-        $(document).on("input", "#input-card-title", function(){
-            url=$('#heading-card-title').attr('action');
-            id =$('#heading-card-title').data('card_id');
-            var title=$('#input-card-title').val();
-            if (title){
-                data = {
-                    title : title,
-                    card_id : id
-                }
-
-                $.post(url,data,reload_card_title,'json'), function(err){
-                    console.log("error");
-                };
-            }
-        });
-
 
         // Saving changes for card description
         $(document).on("click", "#card-button-add-description", function(){
@@ -694,14 +708,19 @@ $(document).ready(function() {
                   +'<div class="modal-dialog modal-lg">'
                    +'    <div class="modal-content">'
                    +'       <div class="modal-header">'
-
+                    +'      <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
                    +'         <h3 id="heading-card-title" data-card_id="'+card_id+'" action="'+popped_card_title_link+'" class="modal-title card-class-title"><strong><div class="reload-title">'+card_name+'</div></strong></h3>'
                   +'          <input id="input-card-title" class="form-control card-class-title display-none" value="'+card_name+'"> '
+
+                   +'         <button name="" id="card-button-update-title"class="btn btn-secondary card-button-add-description mt-3 ml-1 display-none float-right">Update</button>'
+                   +'        <button name="" id="card-button-cancel-title"class="btn btn-secondary card-button-add-description mt-3 ml-1 display-none float-right">Cancel</button>'
+                   + '       </div>'
+                   +'      <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">'
                    +'         <button type="button" class="close" data-dismiss="modal" aria-label="Close">'
                    +'           <span aria-hidden="true">&times;</span>'
                    +'         </button>'
-
                    +'       </div>'
+                   +'     </div>'
                    +'       <div class="modal-body">'
                    +'          <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
                    +'               <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>'
