@@ -21,11 +21,11 @@ def activity_stream_heading(activity):
         },
         'list': {
             'property': ['name'],
-            'str': ' a list named "{}"'
+            'str': ' list named "{}"'
         },
         'column': {
             'property': ['name'],
-            'str': ' a column named "{}"'
+            'str': ' column named "{}"'
         },
         'referral': {
             'property': ['email'],
@@ -37,7 +37,7 @@ def activity_stream_heading(activity):
         },
         'board': {
             'property': ['name'],
-            'str': ' a board named "{}"'
+            'str': ' board named "{}"'
         },
         'card member': {
             'property': ['board_member','user', 'username'],
@@ -45,7 +45,7 @@ def activity_stream_heading(activity):
         },
         'card comment': {
             'property': ['comment'],
-            'str': ' a comment "{}" on  a card'
+            'str': ' comment "{}" on  a card'
         }
     }
     # * makes *args know that you are passing a list

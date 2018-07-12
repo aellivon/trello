@@ -20,7 +20,7 @@ class BoardModalForm(forms.Form):
     def save_board(self, user):
         new_board = Board(name=self.cleaned_data.get('board_name'), owner=user)
         new_board.save()
-        new_board.activity.create(user=user, action="added")
+        new_board.activity.create(user=user, action="added",board=new_board)
 
     def update_board(self, board):
         board.name = self.cleaned_data.get('board_name')
@@ -74,20 +74,22 @@ class MembersModalForm(forms.Form):
         user = get_object_or_None(User, email=email)
         new_referral.user = user
         new_referral.save()
-        new_referral.activity.create(user=inviter, action="invited")
+        new_referral.activity.create(
+            user=inviter, action="invited", board=board)
 
-    def remove_members(self, to_remove, remover):
+    def remove_members(self, to_remove, remover, board):
         # removing members from a board
 
         members=BoardMember.objects.filter(id__in=to_remove)
         for member in members:
-            member.activity.create(user=remover, action="removed")
+            member.activity.create(
+                user=remover, action="removed", board=board)
             member.delete()
             
 
     def remove_member(self, user_id, board, remover):
         member=BoardMember.objects.get(user__id=user_id, board=board)
-        member.activity.create(user=remover, action="left")
+        member.activity.create(user=remover, action="left", board=board)
         member.delete()
 
 
@@ -157,13 +159,13 @@ class UserValidationForm(forms.Form):
         return user
 
 
-    def join_board(self, user, token):
+    def join_board(self, user, token, board):
         referral = get_object_or_None(Referral, token=token)
         if referral.board_member.user:
             board_member=referral.board_member
             board_member.is_confirmed = True
             board_member.activity.create(
-                user=board_member.user, action="joined")
+                user=board_member.user, action="joined", board=board)
         else:
             board_member=referral.board_member
             board_member.is_confirmed = True

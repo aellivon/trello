@@ -3,17 +3,13 @@ $(document).ready(function() {
 
 
 
-        /* Set the width of the side navigation to 250px */
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-        }
-
-        /* Set the width of the side navigation to 0 */
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-        }
-
-        openNav();
+         $(document).on("click", '#btn-board-stream', function(){
+            $('.sidebar').addClass('open');
+         })
+         
+         $(document).on("click", '.close-sidebar', function(){
+            $('.sidebar').removeClass('open');
+         })
         // Drag and drop mechanics
         function init_drag_and_drop_mechanics(){
             $('.card-reactor').draggable({
@@ -864,21 +860,24 @@ $(document).ready(function() {
                             + '    <button id="close-add-list" type="button" '
                            + '      class="btn btn-secondary close-add-list"> '
                            + '      Cancel</button>  '
-                          + '  </form>';
+                          + '  </form>'
+                          + '<div class="group-cards">';
                              b = 0;
                              while(b < cards.length){
                                 if (cards[b].fields.column == columns[a].pk){
-                                    html+= '<div id="existing-card-'+column_id+'" data-card_id='+cards[b].pk+' class="card-reactor" data-value="'+column_id+'">'
+                                    html+= ' '
+                                        + '<div id="existing-card-'+column_id+'" data-card_id='+cards[b].pk+' class="card-reactor" data-value="'+column_id+'">'
                                         +' <center>'
                                         +' <label data-value="'+column_id+'" class=" form-control card-column-class non-editable-add-card">'+cards[b].fields.name+'</label>'
                                         +' </center>'
                                         +'  <form id="archive-form" action="'+archived_popped_url+'" data-url="'+archived_popped_url+'" data-value="'+column_id+'" novalidate="">'
                                         +'  </form>'
-                                        +' </div>'
+                                        +' </div>';
                                 }
                                 b+=1;
                              }
-                              html += '   <!-- Add Card -->'
+                              html += '  ' 
+                                      + '<!-- Add Card -->'
                                       + '         <form  id="existing-form-'+column_id+'"'
                                       + ' class="existing-form"  data-value="'+column_id+'"'
                                       + ' action=""'
@@ -891,6 +890,8 @@ $(document).ready(function() {
                                       + '<button id="close-add-list" type="button" class="btn'
                                       + 'btn-secondary close-add-list">Cancel</button>'  
                                       + '         </form>'
+                                      + '</div>'
+                                      +'<div class="add-card-division">'
                                       + '       <div class="add-card-reactor-'+column_id+'">'
                                       + '         <label class="form-control title-card-class'
                                       +' non-editable-add-card" data-value="'+column_id+'"'
@@ -910,6 +911,7 @@ $(document).ready(function() {
                                       + 'type="button" class="btn btn-secondary close-add-card">'
                                       + 'Cancel</button>'
                                       + '     </form>'
+                                      +'</div>'
                                       + ' </div>';
                                html+=' </div>';
                 a+=1;

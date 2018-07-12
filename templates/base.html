@@ -13,9 +13,15 @@
 		  <script src="{% static '/non-vendors/js/general.js' %}"></script>
 	</head>
 	<body>
-		{% block body %}
 
-		{% endblock %}
+			{% if user.is_authenticated %}
+				{% include 'nav_bar.html' %}
+			{% endif %}
+			<div class="body_wrapper">
+				{% block body %}
+				{% endblock %}
+			</div>
+
 	</body>
 		
 </html>

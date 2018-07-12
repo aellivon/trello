@@ -17,6 +17,7 @@ class Activity(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     modified = models.DateTimeField(default=datetime.now)
+    board = models.ForeignKey('boards.Board', on_delete=models.CASCADE)
     
     def __str__(self):
         return "{}".format(self.user) 

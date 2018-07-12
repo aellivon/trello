@@ -26,7 +26,6 @@ class ActivityView(LoginRequiredMixin,TemplateView):
         user = self.request.user
         activity = Activity.objects.filter(
             Q(user=user)).order_by('-modified')
-
         context={'activities':activity, 'current_user' : self.request.user.username}
 
         return render(self.request, self.template_name,context)

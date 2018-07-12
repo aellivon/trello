@@ -1,10 +1,37 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
+{% load staticfiles activity_stream %}
 
 {% block body %}
-    {% include 'nav_bar.html' %}
+    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 container">
     <!-- Design for modals -->
     <!-- Update Board Modal  -->
+
+    <div class="sidebar">
+      <div class="container">
+        <p class="title-activity"><strong>📕 Board Activity</strong></p>
+        <a class="close-sidebar">X</a>
+      </div>
+      <div class="sidebar-body">
+          <hr>
+          {% for activity in activities %} 
+            <div class="row activity-content">
+              🅰️ "{{activity.user}}"
+              {{activity.action}} 
+              {{ activity|activity_stream_heading }}
+            </div>
+            <div class="row activity-footer"> 
+              {% if  activity.modified %}
+                {{activity.modified}}
+              {% endif %}
+            
+              {% if  activity.board_name %}
+                - on board {{activity.board_name}}
+              {% endif %} 
+            </div>  
+            <hr>
+          {% endfor %}
+      </div>
+    </div>
 
     <div class="modal fade modal-fixed" id="EditBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -468,7 +495,7 @@
         <div class="col-lg-4 col-md-6 col-sm-7 col-xs-7 show custom-boards-dropdown form-inline">
             {% if owner %}
                 <div class="dropdown ml-auto">
-              <button name="MessageBoxModalAlert" class="btn btn-primary" data-dismiss="modal">Board Stream</button>
+              <button name="MessageBoxModalAlert" class="btn btn-primary" id="btn-board-stream" data-dismiss="modal">Board Stream</button>
               <a class="btn btn-primary dropdown-toggle ml-2" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Members
               </a>
@@ -527,7 +554,7 @@
 
                     <hr>
 
-                   
+                <div class="group-cards">
                 {% for card in cards %}
                     {% if card.column == column %}
                       <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
@@ -539,6 +566,7 @@
                     </div>
                     
                 <!-- Add Card -->
+
                       <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}">
                           <input id="exist-list-{{column.id}}" class="form-control title-column-class" data-value="{{column.id}}" value="{{card.name}}"> 
                           <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Update</button> 
@@ -546,17 +574,19 @@
                       </form>
                     {% endif %}
                 {% endfor %}
+                </div>
 
+                <div class="add-card-division">
+                      <div class="add-card-reactor-{{column.id}}">
+                        <label class="form-control title-card-class editable-add-card" data-value="{{column.id}}" placeholder="Add List">Add Card</label>
+                    </div>
 
-                    <div class="add-card-reactor-{{column.id}}">
-                      <label class="form-control title-card-class non-editable-add-card" data-value="{{column.id}}" placeholder="Add List">Add Card</label>
-                  </div>
-
-                  <form id="card-add-form-column-{{column.id}}" class="card-add-form-class toggle-card" action="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}" data-value="{{column.id}}">
-                      <input id="add-card-{{column.id}}" class="form-control title-column-class" placeholder="Enter Another Card Here"> 
-                      <button name="AddColumn" type="submit" class="btn btn-success btn-add-card">Add</button> 
-                      <button id="close-add-card" data-value="{{column.id}}" type="button" class="btn btn-secondary close-add-card">Cancel</button>  
-                  </form>
+                    <form id="card-add-form-column-{{column.id}}" class="card-add-form-class toggle-card" action="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}" data-value="{{column.id}}">
+                        <input id="add-card-{{column.id}}" class="form-control title-column-class" placeholder="Enter Another Card Here"> 
+                        <button name="AddColumn" type="submit" class="btn btn-success btn-add-card">Add</button> 
+                        <button id="close-add-card" data-value="{{column.id}}" type="button" class="btn btn-secondary close-add-card">Cancel</button>  
+                    </form>
+                </div> 
               </div>
             {% endfor %}
               <div class="floatbox">
