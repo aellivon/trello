@@ -1,6 +1,19 @@
 
 $(document).ready(function() {
 
+
+
+        /* Set the width of the side navigation to 250px */
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+        }
+
+        /* Set the width of the side navigation to 0 */
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+
+        openNav();
         // Drag and drop mechanics
         function init_drag_and_drop_mechanics(){
             $('.card-reactor').draggable({
@@ -8,7 +21,14 @@ $(document).ready(function() {
                 containment: ".inner-wrap",
                 start  : function(event, ui){
                     $(ui.helper).addClass("ui-helper");
+                     $(this).draggable('instance').offset.click = {
+                        // This helps the draggable instance to be in
+                        //      the center of the cursor.
+                        left: Math.floor(ui.helper.width() / 2),
+                        top: Math.floor(ui.helper.height() / 2)
+                    }; 
                 }
+
             });
 
             $('.transferable-columns').droppable({
@@ -105,6 +125,7 @@ $(document).ready(function() {
                 $("#card-save-button-"+card_id).addClass('display-none');
                 $("#card-cancel-button-"+card_id).addClass('display-none');
         })
+
 
 
         $('#DeleteCommentModal').on('hidden.bs.modal', function () {

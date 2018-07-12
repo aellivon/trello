@@ -34,6 +34,9 @@
         </div>
       </div>
     </div>
+
+  
+
     <!-- Archiving Modal -->
     <div class="modal fade modal-fixed" id="ArchiveBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -465,8 +468,8 @@
         <div class="col-lg-4 col-md-6 col-sm-7 col-xs-7 show custom-boards-dropdown form-inline">
             {% if owner %}
                 <div class="dropdown ml-auto">
-
-              <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button name="MessageBoxModalAlert" class="btn btn-primary" data-dismiss="modal">Board Stream</button>
+              <a class="btn btn-primary dropdown-toggle ml-2" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Members
               </a>
 
@@ -503,6 +506,7 @@
         </div>
 
     </div>
+
     <!--  Board Dynamic Design Stuff -->
     <div class ="outer-wrap">
         <div class="inner-wrap">
@@ -571,6 +575,8 @@
         </div>  
     </div>
 </div>
+
+
       <input id="hidden-card-add-values" type="hidden" value="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}"></input>
       <input id="hidden-column-archive-values" type="hidden" value="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}"></input>
       <input id="hidden-column-update-values" type="hidden" value="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}"></input>  
@@ -581,6 +587,5 @@
       <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
       <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
       <input id="hidden-transfer-cards" type="hidden" data-url="{% url 'boards:transfer_cards' id=board.id %}"></input>
-      
       
 {% endblock %}
