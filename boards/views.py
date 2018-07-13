@@ -257,13 +257,8 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
         elif 'LeaveConfirmationModal' in self.request.POST:
             member_form = self.member_form()
             board_form = self.board_form()
-            member_form.activity.create(
-                user=self.request.user,
-                action=ACTIVITY_ACTION['LEFT'],
-                board=board
-            )
             user_id = self.request.user.id
-            member_form.remove_member(user_id, board, self.request.user, board)
+            member_form.remove_member(user_id, board, self.request.user)
             return HttpResponseRedirect(reverse('boards:home' , 
                 kwargs={'username': username 
             }))
@@ -657,6 +652,7 @@ class UserValidationView(TemplateView):
         Views for the User Validation Page
     """
     template_name = "boards/user_validation.html"
+    error_validation = "boards/logged_in_error.html"
     form = UserValidationForm
 
     def get(self, *args, **kwargs):
@@ -698,7 +694,8 @@ class UserValidationView(TemplateView):
                          'do_not_show' : True
                         }
                     ) 
-        return HttpResponseBadRequest()
+        return render(self.request, self.error_validation,
+            {"current_user":self.request.user.username})
 
     def post(self, *args, **kwargs):
         form = self.form(self.request.POST)
@@ -725,4 +722,5 @@ class UserValidationView(TemplateView):
                     'account' : False, 'do_not_show' : True
                     }
                 ) 
-        return HttpResponseBadRequest()
+        return render(self.request, self.error_validation,
+            {"current_user":self.request.user.username})

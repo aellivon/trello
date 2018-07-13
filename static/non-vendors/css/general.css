@@ -179,6 +179,10 @@ body{
     font-weight: bold;
 }
 
+.margin-top-20{
+    margin-top: 20%;
+}
+
 .card-description{
     min-height:100px;
     text-indent: 40px;
@@ -460,7 +464,8 @@ hr.border{
 .outer-wrap {
     width:100%; 
     margin-top: 9%;
-    overflow: auto; 
+    overflow: auto;
+    height: 75%;
 }
 .inner-wrap {
     float:left;

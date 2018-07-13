@@ -543,14 +543,18 @@ $(document).ready(function() {
                 name : name,
                 id : id
             }
+
+            console.log("addd");
             var url = $('.card-add-form-class').attr('action');
             if (url == undefined){
                 url = $('#hidden-card-add-values').val();
             }
-                
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-                console.log('error');
-            };
+            if(name.length){
+                $.post(url,data,reload_inner_wrapper,'json'), function(err){
+                    console.log('error');
+                };
+            }
+
         });
 
         // Card Ajax

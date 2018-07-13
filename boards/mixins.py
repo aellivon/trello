@@ -1,6 +1,7 @@
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
+from django.shortcuts import render
 from .models import Column, Card, CardComment, BoardMember, Board
 from users.models import User
 from activity.models import Activity
@@ -66,6 +67,7 @@ class BoardPermissionMixIn():
         Get if the one accessing the url is a board member.
         If not board member, throw bad request.
     """
+    error_board = "boards/error_member.html"
     def dispatch(self, request, *args, **kwargs):
         board_id = self.kwargs.get('id')
         # Permission Denied if 404
@@ -73,7 +75,8 @@ class BoardPermissionMixIn():
             BoardMember, board__id=board_id, user__pk=self.request.user.id,
             archived=False)
         if not exists:
-            return HttpResponseBadRequest()
+            return render(self.request, self.error_board,
+                {"current_user":self.request.user.username})
 
         return super().dispatch(request, *args, **kwargs)
 
