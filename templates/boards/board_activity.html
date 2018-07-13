@@ -1,0 +1,19 @@
+{% load activity_stream humanize %}
+        <hr>
+          {% for activity in activities %} 
+            <div class="row activity-content">
+              - "{{activity.user}}"
+              {{activity.action}} 
+              {{ activity|activity_stream_heading }}
+            </div>
+            <div class="row activity-footer"> 
+              {% if  activity.modified %}
+                {{activity.modified|naturaltime}}
+              {% endif %}
+            
+              {% if  activity.board_name %}
+                - on board {{activity.board_name}}
+              {% endif %} 
+            </div>  
+            <hr>
+          {% endfor %}

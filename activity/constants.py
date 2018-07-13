@@ -11,4 +11,7 @@ ACTIVITY_ACTION = {
     'ASSIGNED': 'assigned',
     'UNASSIGNED': 'unassigned',
     'UPDATE_DUE_DATE': 'updated due date on a',
+    'JOINED': 'joined',
+    'REMOVED': 'removed'
+
 }

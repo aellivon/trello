@@ -29,11 +29,11 @@ def activity_stream_heading(activity):
         },
         'referral': {
             'property': ['email'],
-            'str': ' invited "{}"'
+            'str': ' "{}"'
         },
         'board member': {
-            'property': ['board', 'name'],
-            'str':  ' joined "{}"'
+            'property': ['user', 'username'],
+            'str':  ' "{}"'
         },
         'board': {
             'property': ['name'],

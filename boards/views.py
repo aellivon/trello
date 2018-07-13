@@ -7,7 +7,7 @@ from activity.models import Activity
 from .forms import BoardModalForm, MembersModalForm, UserValidationForm
 from annoying.functions import get_object_or_None
 from django.http import (HttpResponse, HttpResponseRedirect,
-    HttpResponseBadRequest, JsonResponse)
+    HttpResponseBadRequest, JsonResponse, Http404)
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,6 +22,13 @@ import dateutil.parser
 import pytz
 from django.db.models import Q
 from activity.constants import ACTIVITY_ACTION 
+
+
+
+class ThrowToSpecificPage(LoginRequiredMixin, ThrowHomeIfLoggedInMixIn, View):
+    login_url = reverse_lazy('users:log_in')
+    def get(self, *args, **kwargs):
+        raise Http404()
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -39,7 +46,8 @@ class IndexView(LoginRequiredMixin,TemplateView):
         username = self.kwargs.get('username')
         user = get_object_or_404(User,username=username)
         boards = BoardMember.objects.filter(
-            user=user,board__archived=False,is_confirmed=True).order_by('-pk')
+            user=user,board__archived=False, is_confirmed=True, archived = False
+        ).order_by('-pk')
         return render(self.request, self.template_name,
             {'form':context, 'boards': boards, 'current_user' : username}
         )
@@ -52,14 +60,15 @@ class IndexView(LoginRequiredMixin,TemplateView):
         if form.is_valid():
             form.save_board(user)
             boards = BoardMember.objects.filter(
-                user=user,board__archived=False,is_confirmed=True).order_by('-pk')
+                user=user,board__archived=False,is_confirmed=True, archived = False
+            ).order_by('-pk')
             form = self.form()
             return render(self.request, self.template_name,
                 {'form':form, 'boards': boards, 'current_user' : username}
             )
         else:
              boards = BoardMember.objects.filter(
-                user=user,board__archived=False,is_confirmed=True)
+                user=user,board__archived=False,is_confirmed=True, archived = False)
 
         
         return render(self.request, self.template_name, 
@@ -86,12 +95,12 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
         board_id = self.kwargs.get('id')
         username = self.request.user.get_username()
         access = get_object_or_404(BoardMember,user__username=username,
-            is_confirmed=True,board__id=board_id)
+            is_confirmed=True,board__id=board_id, archived = False)
         board = get_object_or_404(Board,pk=board_id)
         board_member = BoardMember.objects.filter(
-            board__id=board_id)
+            board__id=board_id, archived = False)
         referral = Referral.objects.filter(
-            board_member__board__id=board_id).exclude(
+            board_member__board__id=board_id, archived = False).exclude(
                 board_member__user=board.owner)
         columns = Column.objects.filter(
             board__id=board_id,archived=False).order_by('position')
@@ -119,18 +128,20 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
         board_id = self.kwargs.get('id')
         username = self.request.user.get_username()
         access = get_object_or_404(BoardMember,user__username=username,
-            is_confirmed=True,board__id=board_id)
+            is_confirmed=True,board__id=board_id, archived = False)
         board = get_object_or_404(Board,pk=board_id)
         columns = Column.objects.filter(
             board__id=board_id,archived=False).order_by('position')
         owner = False
         board_member = BoardMember.objects.filter(
-            board__id=board_id)
+            board__id=board_id, archived = False)
         referral = Referral.objects.filter(
-            board_member__board__id=board_id).exclude(
+            board_member__board__id=board_id, archived = False).exclude(
             board_member__user=board.owner)
         card = Card.objects.filter(
             column__board__id=board_id,archived=False)
+        activity = Activity.objects.filter(
+            board=board).order_by('-modified')
         if board.owner == self.request.user:
             owner = True
         # Edit Board Form
@@ -153,7 +164,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
                             'message_box':None, 'owner' : owner,
                             'board_member' : board_member, 'columns' : columns,
                             'referral': referral, 'cards': card,
-                            'owner_instance' : board.owner
+                            'owner_instance' : board.owner, 'activities' : activity
                         }
                     )
                     
@@ -165,7 +176,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
                  'message_box':None, 'owner' : owner,
                  'board_member' : board_member, 'columns' : columns, 
                  'referral' : referral, 'cards': card, 
-                 'owner_instance' : board.owner
+                 'owner_instance' : board.owner, 'activities': activity
                 }
             )
         # Archiving Board Form
@@ -189,7 +200,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
                     'board':board, 'current_user' : username,
                     'message_box': None, 'owner' : owner, 'board_member' : board_member,
                      'columns' : columns, 'referral':referral, 'cards': card,
-                     'owner_instance' : board.owner
+                     'owner_instance' : board.owner, 'activities': activity
                 }
             )
         # Inviting a member form
@@ -213,7 +224,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
                         'message_box':message_box, 'owner' : owner,
                         'board_member' : board_member, 'columns' : columns,
                         'referral' : referral, 'cards': card,
-                        'owner_instance' : board.owner
+                        'owner_instance' : board.owner, 'activities': activity
                     }
                 )
 
@@ -225,7 +236,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
                    'message_box':None, 'owner' : owner,
                     'board_member' : board_member, 'columns' : columns,
                     'referral' : referral, 'cards': card,
-                    'owner_instance' : board.owner
+                    'owner_instance' : board.owner, 'activities': activity
                 }
             )
         elif 'RemoveMemberModal' in self.request.POST:
@@ -240,7 +251,7 @@ class BoardView(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
                    'board':board, 'current_user' : username,
                    'message_box':None, 'owner' : owner, 'board_member' : board_member,
                     'columns' : columns, 'referral' : referral, 'cards': card,
-                    'owner_instance' : board.owner
+                    'owner_instance' : board.owner, 'activities': activity
                 }
             )
         elif 'LeaveConfirmationModal' in self.request.POST:
@@ -471,6 +482,18 @@ class DeleteComment(LoginRequiredMixin, BoardPermissionMixIn,
         return JsonResponse(data)
         
 
+class GetBoardStream(LoginRequiredMixin, BoardPermissionMixIn, TemplateView):
+    template_name = 'boards/board_activity.html'
+
+    def get(self, *args, **kwargs):
+        if not self.request.is_ajax():
+            raise Http404()
+        board = get_object_or_404(Board,pk=self.kwargs.get('id'))
+        activity = Activity.objects.filter(
+            board=board).order_by('-modified')
+        context = {'activities': activity}
+        return render(self.request, self.template_name, context)
+
 
 class TransferCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, View):
     """
@@ -490,6 +513,7 @@ class TransferCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vie
         from_column_instance = get_object_or_404(
             Column, pk=self.request.POST.get('from_column_id')
         )
+        
         # activity stream
         card.activity.create(
             user=self.request.user,
@@ -497,8 +521,6 @@ class TransferCard(LoginRequiredMixin, BoardPermissionMixIn, AJAXBoardMixIn, Vie
             board=board 
         )
 
-        user = User.objects.get(id=self.request.user.id)
-        board = Board.objects.get(id=self.kwargs.get('id'))
         data=self.return_board()
         return JsonResponse(data)
         
@@ -519,7 +541,7 @@ class AssignMembers(LoginRequiredMixin, BoardPermissionMixIn, AJAXCardMixIn, Vie
         card_instance = get_object_or_404(Card,pk=card_id)
         for element in selected:
             board_member = get_object_or_404(
-                BoardMember, pk=element
+                BoardMember, pk=element, archived = False
             )
             exists= get_object_or_None(
                 CardMember, board_member=board_member, card=card_instance)
@@ -639,7 +661,7 @@ class UserValidationView(TemplateView):
 
     def get(self, *args, **kwargs):
         token = self.kwargs.get('token')
-        referral = get_object_or_404(Referral, token=token)
+        referral = get_object_or_404(Referral, token=token, archived = False)
         board = referral.board_member.board
         email = referral.email
         form = self.form()
@@ -654,6 +676,8 @@ class UserValidationView(TemplateView):
                     user = form.login(self.request, user=user)
                     proceed = True
                 else:
+
+                    print ("")
                     if self.request.user.email == email:
                         user = self.request.user
                         proceed = True
@@ -661,19 +685,26 @@ class UserValidationView(TemplateView):
                 if proceed:
                     # falls short when the logged in user is not the same referral email
                     return render(self.request, self.template_name,
-                        {'form':form, 'email' : email, 'board': board , 'account' : True}
+                        {'form':form, 'email' : email,
+                         'board': board , 'account' : True,
+                         'do_not_show' : True
+                        }
                     )
             else:
-                return render(self.request, self.template_name,
-                    {'form':form, 'email' : email, 'board': board, 'account' : False}
-                ) 
+                if not self.request.user.is_authenticated:
+                    return render(self.request, self.template_name,
+                        {'form':form, 'email' : email,
+                         'board': board, 'account' : False,
+                         'do_not_show' : True
+                        }
+                    ) 
         return HttpResponseBadRequest()
 
     def post(self, *args, **kwargs):
         form = self.form(self.request.POST)
         user = self.request.user
         token = self.kwargs.get('token')
-        referral = get_object_or_404(Referral, token=token)
+        referral = get_object_or_404(Referral, token=token, archived = False)
         board = referral.board_member.board
         email = referral.email
         if 'JoinBoard' in self.request.POST:
@@ -685,10 +716,13 @@ class UserValidationView(TemplateView):
             if form.is_valid():
                 user = form.save(email)
                 user = form.login(self.request, user=user)
-                board_id = form.join_board(user,token)
+                board_id = form.join_board(user,token, board)
                 return HttpResponseRedirect(reverse('boards:board' , kwargs={'id':board_id  }))
             else:
                 return render(self.request, self.template_name,
-                    {'form':form, 'email' : email, 'board': board , 'success': True , 'account' : False}
+                    {'form':form, 'email' : email,
+                     'board': board , 'success': True ,
+                    'account' : False, 'do_not_show' : True
+                    }
                 ) 
         return HttpResponseBadRequest()

@@ -4,7 +4,9 @@
        local('abc');
 }*/
 
-
+body{
+    padding: 0px;
+}
 
 .body_wrapper{
    display:flex;
@@ -13,6 +15,8 @@
    width:100%;
    margin:0;
 }
+
+
 
 .ui-helper {
     opacity: 0.90;
@@ -136,6 +140,10 @@
     margin-top: 10px;
 }
 
+
+.padding-left-40{
+    padding-left: 40px;
+}
 .card-comment-time-user{
 
     font-size: 15px;
@@ -395,6 +403,7 @@ hr.border{
 
 .custom-navbar{
 	background-color: #026aa7;
+    width: 100%;
 }
 
 .custom-left-drop-down{
@@ -544,9 +553,9 @@ hr.border{
 .sidebar{
     padding: 8px 12px;
     position: absolute;
-    right: -300px;
+    right: -320px;
     top: 0;
-    width: 300px;
+    width: 320px;
     height: 100vh;
     z-index: 15;
     background-color: white;
@@ -564,9 +573,10 @@ hr.border{
 .sidebar-body{
     padding-left:20px;
     padding-right: 5px;
-    overflow-y: auto;
     height: 100%;
     width:100%;
+
+    overflow-y: auto;
 }
 
 .title-activity{
@@ -591,4 +601,16 @@ hr.border{
     max-height:350px;
     padding: 0px;
     margin-bottom: 5px;
+}
+
+
+.body-wrapper{
+    height: 100vh;
+    width:100%;
+    overflow-y: hidden;
+}
+
+.body-class {
+    overflow-y: hidden;
+    overflow-x: hidden;
 }

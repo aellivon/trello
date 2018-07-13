@@ -39,6 +39,7 @@ class Referral(models.Model):
     token = models.TextField()
     email = models.TextField()
     activity = GenericRelation(Activity)
+    archived= models.BooleanField(default=False)
         
     def generate_token(self):
         # Generating secure token using python 3.6 libraries
@@ -79,6 +80,11 @@ class Card(models.Model):
 
     def __str__(self):
         return "{}".format(self.name)
+
+    # Mabalik na ni sa json
+    @property
+    def is_overdue(self):
+        return True
 
 class CardMember(models.Model):
     """

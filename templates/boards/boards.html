@@ -1,27 +1,27 @@
 {% extends 'base.html' %}
-{% load staticfiles activity_stream %}
-
+{% load staticfiles activity_stream humanize %}
+{% block body_class %} body-class
+{% endblock %}
 {% block body %}
-    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 container">
     <!-- Design for modals -->
     <!-- Update Board Modal  -->
-
+    <div class="body-wrapper">
     <div class="sidebar">
       <div class="container">
-        <p class="title-activity"><strong>📕 Board Activity</strong></p>
+        <p class="title-activity"><strong> Board Activity</strong></p>
         <a class="close-sidebar">X</a>
       </div>
       <div class="sidebar-body">
           <hr>
           {% for activity in activities %} 
             <div class="row activity-content">
-              🅰️ "{{activity.user}}"
+              - "{{activity.user}}"
               {{activity.action}} 
               {{ activity|activity_stream_heading }}
             </div>
             <div class="row activity-footer"> 
               {% if  activity.modified %}
-                {{activity.modified}}
+                {{activity.modified|naturaltime}}
               {% endif %}
             
               {% if  activity.board_name %}
@@ -78,6 +78,27 @@
             </div>
               <div class="modal-footer">
                 <button name="ArchiveBoardModal" type="submit" class="btn btn-primary">Yes</button>
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
+        <!-- Archiving Column -->
+  <div class="modal fade modal-fixed" id="ArchiveColumnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Archive Column</h5>
+          </div>
+          <form name="ArchiveColumnModal" method="post" novalidate="">
+            {% csrf_token %}
+              <div class="modal-body">
+                    Are you sure you want to archive this column?
+            </div>
+              <div class="modal-footer">
+                <button id="archived-column-yes" name="ArchiveColumnModal" type="submit" class="btn btn-primary">Yes</button>
                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
               </div>
         </form>
@@ -488,11 +509,12 @@
     </div>
   </div>
     <!-- Design for page elements -->
+
     <div class="row custom-row">
-        <div class="col-lg-8 col-md-6 col-sm-5 col-xs-5 ">
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 padding-left-40">
             <p class="custom-boards-title"> {{ board.name }} </p>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-7 col-xs-7 show custom-boards-dropdown form-inline">
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 show custom-boards-dropdown form-inline">
             {% if owner %}
                 <div class="dropdown ml-auto">
               <button name="MessageBoxModalAlert" class="btn btn-primary" id="btn-board-stream" data-dismiss="modal">Board Stream</button>
@@ -521,6 +543,7 @@
                 </div>
             {% else %}
               <div class="dropdown ml-auto text-right dropdown-right">
+                  <button name="MessageBoxModalAlert" class="btn btn-primary" id="btn-board-stream" data-dismiss="modal">Board Stream</button>
                   <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                   </a>
@@ -604,7 +627,7 @@
                   
         </div>  
     </div>
-</div>
+  </div>
 
 
       <input id="hidden-card-add-values" type="hidden" value="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}"></input>
@@ -617,5 +640,5 @@
       <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
       <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
       <input id="hidden-transfer-cards" type="hidden" data-url="{% url 'boards:transfer_cards' id=board.id %}"></input>
-      
+      <input id="hidden-activity" type="hidden" data-url="{% url 'boards:get_board_stream' id=board.id %}"></input>
 {% endblock %}

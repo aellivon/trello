@@ -368,21 +368,28 @@ $(document).ready(function() {
 
         $(document).on('submit','#archive-form', function(e){
             e.preventDefault()
-            id=$(this).data('value');
+            $("#ArchiveColumnModal").data('value',$(this).data('value'));
+            $("#ArchiveColumnModal").data('action',$(this).data('action'));
+            $("#ArchiveColumnModal").modal("show");
+        });
+
+        $(document).on('click','#archived-column-yes', function(e){
+            e.preventDefault();
+
+            id=$('#ArchiveColumnModal').data('value');
+            var url = $('#ArchiveColumnModal').data('action');
 
             data = {
                 id : id
             }
-            var url = $(this).attr('action');
-
             if (url == undefined){
                 url = $('#hidden-column-archive-values').val();
             }
+             $("#ArchiveColumnModal").modal("hide");
             $.post(url,data,reload_inner_wrapper,'json'), function(err){
 
             };
         });
-
 
         pop_members = function(data){
 
@@ -461,6 +468,7 @@ $(document).ready(function() {
             .done(function() {
                 $('#CardModal').modal('show');
                 $('#DueDateModal').modal('hide');
+                reload_board_stream();
               })
             .fail(function(err){
                 console.log(err);
@@ -618,8 +626,16 @@ $(document).ready(function() {
             };
         }
 
+        // Reloading Board Stream
+        reload_board_stream = function(data){
 
+            url = $('#hidden-activity').data('url');
+            $.get(url)
+            .done(function(response) {
+               $('.sidebar-body').html(response);
+            });
 
+        }
         // Html population Region
         reload_card_title = function(data){
            $('.reload-title').empty();
@@ -627,6 +643,7 @@ $(document).ready(function() {
            html = cards[0].fields.name;
            $(".reload-title").append(html);
            get_board();
+           reload_board_stream(data);
 
         }
 
@@ -653,7 +670,7 @@ $(document).ready(function() {
         reload_comments = function(data){
             $('.comment-reactor').empty();
             comments = JSON.parse(data.comments);
-
+            console.log(data);
             console.log(comments);
 
             html = "";
@@ -665,7 +682,6 @@ $(document).ready(function() {
                  +'      <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
                  +'            <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>'
                  +'     </div>';
-                 console.log('sulod');
             }
                     
             index = 0;
@@ -699,6 +715,7 @@ $(document).ready(function() {
                              console.log('sulod');
                }
              $('.comment-reactor').html(html);
+             reload_board_stream(data);
         }
         
         // Reloading the card
@@ -816,6 +833,7 @@ $(document).ready(function() {
                             +'  </div>';
              $(".class-details-reactor").html(html);
              $("#CardModal").modal('show');
+             reload_board_stream(data);
         }
 
         // Reloading the board
@@ -894,7 +912,7 @@ $(document).ready(function() {
                                       +'<div class="add-card-division">'
                                       + '       <div class="add-card-reactor-'+column_id+'">'
                                       + '         <label class="form-control title-card-class'
-                                      +' non-editable-add-card" data-value="'+column_id+'"'
+                                      +' editable-add-card" data-value="'+column_id+'"'
                                       +' placeholder="Add List">Add Card</label>'
                                       + '     </div>'
                                       + '     <form id="card-add-form-column-'+column_id+'"'
@@ -932,6 +950,7 @@ $(document).ready(function() {
             $('.inner-wrap').html(html);
 
             init_drag_and_drop_mechanics();
+            reload_board_stream(data);
         }
 
         
