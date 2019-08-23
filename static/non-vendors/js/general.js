@@ -1,7 +1,52 @@
 
 $(document).ready(function() {
 
-      
+
+
+         $(document).on("click", '#btn-board-stream', function(){
+            $('.sidebar').addClass('open');
+         })
+         
+         $(document).on("click", '.close-sidebar', function(){
+            $('.sidebar').removeClass('open');
+         })
+        // Drag and drop mechanics
+        function init_drag_and_drop_mechanics(){
+            $('.card-reactor').draggable({
+                helper: 'clone',
+                containment: ".inner-wrap",
+                start  : function(event, ui){
+                    $(ui.helper).addClass("ui-helper");
+                     $(this).draggable('instance').offset.click = {
+                        // This helps the draggable instance to be in
+                        //      the center of the cursor.
+                        left: Math.floor(ui.helper.width() / 2),
+                        top: Math.floor(ui.helper.height() / 2)
+                    }; 
+                }
+
+            });
+
+            $('.transferable-columns').droppable({
+                tolerance: "touch",
+                drop: function(event, ui){
+                    var card_id= $(ui.draggable).data("card_id");
+                    var to_column_id = $(this).data("value");
+                    var from_column_id = $(ui.draggable).data('value');
+                    var url = $("#hidden-transfer-cards").data("url");
+                    data = {
+                        card_id : card_id,
+                        to_column_id : to_column_id,
+                        from_column_id : from_column_id
+                    }
+                    $.post(url,data,reload_inner_wrapper,'json'), function(err){
+
+                    };
+                }
+            });
+        }
+
+        init_drag_and_drop_mechanics();
         // using jQuery
         function getCookie(name) {
             var cookieValue = null;
@@ -76,6 +121,7 @@ $(document).ready(function() {
                 $("#card-save-button-"+card_id).addClass('display-none');
                 $("#card-cancel-button-"+card_id).addClass('display-none');
         })
+
 
 
         $('#DeleteCommentModal').on('hidden.bs.modal', function () {
@@ -201,7 +247,38 @@ $(document).ready(function() {
         $(document).on("click", "#heading-card-title", function(){
           $("#heading-card-title").addClass('display-none');
           $("#input-card-title").removeClass('display-none');
+          $("#card-button-update-title").removeClass('display-none');
+          $("#card-button-cancel-title").removeClass('display-none');
           $("#input-card-title").focus();
+        });
+
+        
+        $(document).on("click", "#card-button-cancel-title", function(){
+          $("#heading-card-title").removeClass('display-none');
+          $("#input-card-title").addClass('display-none');
+          $("#card-button-update-title").addClass('display-none');
+          $("#card-button-cancel-title").addClass('display-none');
+        });
+
+        $(document).on("click", "#card-button-update-title", function(){
+            $("#heading-card-title").removeClass('display-none');
+            $("#input-card-title").addClass('display-none');
+            $("#card-button-update-title").addClass('display-none');
+            $("#card-button-cancel-title").addClass('display-none');
+
+            url=$('#heading-card-title').attr('action');
+            id =$('#heading-card-title').data('card_id');
+            var title=$('#input-card-title').val();
+            if (title){
+                data = {
+                    title : title,
+                    card_id : id
+                }
+
+                $.post(url,data,reload_card_title,'json'), function(err){
+                    console.log("error");
+                };
+            }
         });
 
         $(document).on("blur", "#input-card-title", function(){
@@ -291,21 +368,28 @@ $(document).ready(function() {
 
         $(document).on('submit','#archive-form', function(e){
             e.preventDefault()
-            id=$(this).data('value');
+            $("#ArchiveColumnModal").data('value',$(this).data('value'));
+            $("#ArchiveColumnModal").data('action',$(this).data('action'));
+            $("#ArchiveColumnModal").modal("show");
+        });
+
+        $(document).on('click','#archived-column-yes', function(e){
+            e.preventDefault();
+
+            id=$('#ArchiveColumnModal').data('value');
+            var url = $('#ArchiveColumnModal').data('action');
 
             data = {
                 id : id
             }
-            var url = $(this).attr('action');
-
             if (url == undefined){
                 url = $('#hidden-column-archive-values').val();
             }
+             $("#ArchiveColumnModal").modal("hide");
             $.post(url,data,reload_inner_wrapper,'json'), function(err){
 
             };
         });
-
 
         pop_members = function(data){
 
@@ -315,7 +399,10 @@ $(document).ready(function() {
                 var count = 0;
                 var checked = false;
                 while(count < card_member.length){
+                    console.log(card_member);
+                    console.log(card_member[count].fields.board_member);
                     if(card_member[count].fields.board_member == this.value){
+
                         $(this).prop('checked', true);
                         checked = true;
                     }
@@ -354,8 +441,6 @@ $(document).ready(function() {
             e.preventDefault();
             card_id =$('#heading-card-title').data('card_id');
             url=$(this).data('url');
-            console.log(url);
-            console.log(card_id);
             data = {
                 card_id : card_id
             }
@@ -383,6 +468,7 @@ $(document).ready(function() {
             .done(function() {
                 $('#CardModal').modal('show');
                 $('#DueDateModal').modal('hide');
+                reload_board_stream();
               })
             .fail(function(err){
                 console.log(err);
@@ -457,14 +543,18 @@ $(document).ready(function() {
                 name : name,
                 id : id
             }
+
+            console.log("addd");
             var url = $('.card-add-form-class').attr('action');
             if (url == undefined){
                 url = $('#hidden-card-add-values').val();
             }
-                
-            $.post(url,data,reload_inner_wrapper,'json'), function(err){
-                console.log('error');
-            };
+            if(name.length){
+                $.post(url,data,reload_inner_wrapper,'json'), function(err){
+                    console.log('error');
+                };
+            }
+
         });
 
         // Card Ajax
@@ -513,23 +603,6 @@ $(document).ready(function() {
         });
 
 
-        // Changing text card title action
-        $(document).on("input", "#input-card-title", function(){
-            url=$('#heading-card-title').attr('action');
-            id =$('#heading-card-title').data('card_id');
-            var title=$('#input-card-title').val();
-            if (title){
-                data = {
-                    title : title,
-                    card_id : id
-                }
-
-                $.post(url,data,reload_card_title,'json'), function(err){
-                    console.log("error");
-                };
-            }
-        });
-
 
         // Saving changes for card description
         $(document).on("click", "#card-button-add-description", function(){
@@ -557,8 +630,16 @@ $(document).ready(function() {
             };
         }
 
+        // Reloading Board Stream
+        reload_board_stream = function(data){
 
+            url = $('#hidden-activity').data('url');
+            $.get(url)
+            .done(function(response) {
+               $('.sidebar-body').html(response);
+            });
 
+        }
         // Html population Region
         reload_card_title = function(data){
            $('.reload-title').empty();
@@ -566,6 +647,7 @@ $(document).ready(function() {
            html = cards[0].fields.name;
            $(".reload-title").append(html);
            get_board();
+           reload_board_stream(data);
 
         }
 
@@ -592,7 +674,7 @@ $(document).ready(function() {
         reload_comments = function(data){
             $('.comment-reactor').empty();
             comments = JSON.parse(data.comments);
-
+            console.log(data);
             console.log(comments);
 
             html = "";
@@ -604,7 +686,6 @@ $(document).ready(function() {
                  +'      <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
                  +'            <h5 class="modal-card-add-comment" id="exampleModalLabel">Comments</h5>'
                  +'     </div>';
-                 console.log('sulod');
             }
                     
             index = 0;
@@ -638,6 +719,7 @@ $(document).ready(function() {
                              console.log('sulod');
                }
              $('.comment-reactor').html(html);
+             reload_board_stream(data);
         }
         
         // Reloading the card
@@ -664,14 +746,19 @@ $(document).ready(function() {
                   +'<div class="modal-dialog modal-lg">'
                    +'    <div class="modal-content">'
                    +'       <div class="modal-header">'
-
+                    +'      <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
                    +'         <h3 id="heading-card-title" data-card_id="'+card_id+'" action="'+popped_card_title_link+'" class="modal-title card-class-title"><strong><div class="reload-title">'+card_name+'</div></strong></h3>'
                   +'          <input id="input-card-title" class="form-control card-class-title display-none" value="'+card_name+'"> '
+
+                   +'         <button name="" id="card-button-update-title"class="btn btn-secondary card-button-add-description mt-3 ml-1 display-none float-right">Update</button>'
+                   +'        <button name="" id="card-button-cancel-title"class="btn btn-secondary card-button-add-description mt-3 ml-1 display-none float-right">Cancel</button>'
+                   + '       </div>'
+                   +'      <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">'
                    +'         <button type="button" class="close" data-dismiss="modal" aria-label="Close">'
                    +'           <span aria-hidden="true">&times;</span>'
                    +'         </button>'
-
                    +'       </div>'
+                   +'     </div>'
                    +'       <div class="modal-body">'
                    +'          <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">'
                    +'               <h5 class="modal-label-desc" id="exampleModalLabel">Card Description</h5>'
@@ -750,6 +837,7 @@ $(document).ready(function() {
                             +'  </div>';
              $(".class-details-reactor").html(html);
              $("#CardModal").modal('show');
+             reload_board_stream(data);
         }
 
         // Reloading the board
@@ -760,13 +848,15 @@ $(document).ready(function() {
             archived_popped_url = $('#hidden-column-archive-values').val();
             update_popped_url = $('#hidden-column-update-values').val();
             add_card_popped_url = $('#hidden-card-add-values').val();
+            transfer_popped_url = $("#hidden-transfer-cards").data("url");
+            console.log(transfer_popped_url);
             $('.inner-wrap').empty();
             var a = 0;
             html = "";            
             while(a < columns.length){
                 column_id = columns[a].pk;
                 column_name = columns[a].fields.name
-                html += '<div class="floatbox">' 
+                html += '<div class="floatbox transferable-columns" data-value="'+column_id+'" data-url="'+transfer_popped_url+'">  ' 
                          + '<div id="existing-label-'+column_id+'"' 
                        + ' class= "existing-reactor" data-value="'+column_id+'"> '
                        + ' <label data-value="'+column_id+'" '
@@ -792,21 +882,24 @@ $(document).ready(function() {
                             + '    <button id="close-add-list" type="button" '
                            + '      class="btn btn-secondary close-add-list"> '
                            + '      Cancel</button>  '
-                          + '  </form>';
+                          + '  </form>'
+                          + '<div class="group-cards">';
                              b = 0;
                              while(b < cards.length){
                                 if (cards[b].fields.column == columns[a].pk){
-                                    html+= '<div id="existing-card-'+column_id+'" data-card_id='+cards[b].pk+' class="card-reactor" data-value="'+column_id+'">'
+                                    html+= ' '
+                                        + '<div id="existing-card-'+column_id+'" data-card_id='+cards[b].pk+' class="card-reactor" data-value="'+column_id+'">'
                                         +' <center>'
                                         +' <label data-value="'+column_id+'" class=" form-control card-column-class non-editable-add-card">'+cards[b].fields.name+'</label>'
                                         +' </center>'
                                         +'  <form id="archive-form" action="'+archived_popped_url+'" data-url="'+archived_popped_url+'" data-value="'+column_id+'" novalidate="">'
                                         +'  </form>'
-                                        +' </div>'
+                                        +' </div>';
                                 }
                                 b+=1;
                              }
-                              html += '   <!-- Add Card -->'
+                              html += '  ' 
+                                      + '<!-- Add Card -->'
                                       + '         <form  id="existing-form-'+column_id+'"'
                                       + ' class="existing-form"  data-value="'+column_id+'"'
                                       + ' action=""'
@@ -819,9 +912,11 @@ $(document).ready(function() {
                                       + '<button id="close-add-list" type="button" class="btn'
                                       + 'btn-secondary close-add-list">Cancel</button>'  
                                       + '         </form>'
+                                      + '</div>'
+                                      +'<div class="add-card-division">'
                                       + '       <div class="add-card-reactor-'+column_id+'">'
                                       + '         <label class="form-control title-card-class'
-                                      +' non-editable-add-card" data-value="'+column_id+'"'
+                                      +' editable-add-card" data-value="'+column_id+'"'
                                       +' placeholder="Add List">Add Card</label>'
                                       + '     </div>'
                                       + '     <form id="card-add-form-column-'+column_id+'"'
@@ -838,6 +933,7 @@ $(document).ready(function() {
                                       + 'type="button" class="btn btn-secondary close-add-card">'
                                       + 'Cancel</button>'
                                       + '     </form>'
+                                      +'</div>'
                                       + ' </div>';
                                html+=' </div>';
                 a+=1;
@@ -856,6 +952,9 @@ $(document).ready(function() {
                   +'</form>'
               +'</div>';
             $('.inner-wrap').html(html);
+
+            init_drag_and_drop_mechanics();
+            reload_board_stream(data);
         }
 
         

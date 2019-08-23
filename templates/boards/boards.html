@@ -1,10 +1,37 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
-
+{% load staticfiles activity_stream humanize %}
+{% block body_class %} body-class
+{% endblock %}
 {% block body %}
-    {% include 'nav_bar.html' %}
     <!-- Design for modals -->
     <!-- Update Board Modal  -->
+    <div class="body-wrapper">
+    <div class="sidebar">
+      <div class="container">
+        <p class="title-activity"><strong> Board Activity</strong></p>
+        <a class="close-sidebar">X</a>
+      </div>
+      <div class="sidebar-body">
+          <hr>
+          {% for activity in activities %} 
+            <div class="row activity-content">
+              - "{{activity.user}}"
+              {{activity.action}} 
+              {{ activity|activity_stream_heading }}
+            </div>
+            <div class="row activity-footer"> 
+              {% if  activity.modified %}
+                {{activity.modified|naturaltime}}
+              {% endif %}
+            
+              {% if  activity.board_name %}
+                - on board {{activity.board_name}}
+              {% endif %} 
+            </div>  
+            <hr>
+          {% endfor %}
+      </div>
+    </div>
 
     <div class="modal fade modal-fixed" id="EditBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -34,6 +61,9 @@
         </div>
       </div>
     </div>
+
+  
+
     <!-- Archiving Modal -->
     <div class="modal fade modal-fixed" id="ArchiveBoardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -48,6 +78,27 @@
             </div>
               <div class="modal-footer">
                 <button name="ArchiveBoardModal" type="submit" class="btn btn-primary">Yes</button>
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
+        <!-- Archiving Column -->
+  <div class="modal fade modal-fixed" id="ArchiveColumnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Archive Column</h5>
+          </div>
+          <form name="ArchiveColumnModal" method="post" novalidate="">
+            {% csrf_token %}
+              <div class="modal-body">
+                    Are you sure you want to archive this column?
+            </div>
+              <div class="modal-footer">
+                <button id="archived-column-yes" name="ArchiveColumnModal" type="submit" class="btn btn-primary">Yes</button>
                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
               </div>
         </form>
@@ -279,7 +330,7 @@
                                 <label class="form-check-label">
                                 <fieldset id="checkArray">
                                   <div class="assign-division">
-                                    <input name="remove_member" id="assign-checkbox-{{member.user.id}}" class="form-check-input" type="checkbox" value="{{member.user.id}}">
+                                    <input name="remove_member" id="assign-checkbox-{{member.user.id}}" class="form-check-input" type="checkbox" value="{{member.id}}">
                                      {{ member.user.email }}   
                                    </div>
                                 </fieldset>
@@ -380,14 +431,17 @@
         <div class="modal-dialog modal-lg">
              <div class="modal-content">
                 <div class="modal-header">
-
-                  <h3 id="heading-card-title" action="{% url 'boards:update_card_title' id=board.id %}" data-value="card_id" class="modal-title card-class-title"><strong><div class="reload-title">Card Title</div></strong></h3>
-                   <input id="input-card-title" class="form-control card-class-title display-none" value="Card Title"> 
-
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-
+                  <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
+                    <h3 id="heading-card-title" action="{% url 'boards:update_card_title' id=board.id %}" data-value="card_id" class="modal-title card-class-title"><strong><div class="reload-title">Card Title</div></strong></h3>
+                     <input id="input-card-title" class="form-control card-class-title display-none" value="Card Title"> 
+                        <button name="" id="card-button-update-title"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Save</button>
+                        <button name="" id="card-button-cancel-title"class="btn btn-secondary card-button-add-description mt-1 float-right display-none">Cancel</button>
+                  </div>
+                  <div class="right-portion-of-header col-lg-3 col-md-3 col-sm-3">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
                 </div>
                 <div class="modal-body">
                    <div class="left-portion-of-header col-lg-9 col-md-9 col-sm-9">
@@ -455,15 +509,16 @@
     </div>
   </div>
     <!-- Design for page elements -->
+
     <div class="row custom-row">
-        <div class="col-lg-8 col-md-6 col-sm-5 col-xs-5 ">
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 padding-left-40">
             <p class="custom-boards-title"> {{ board.name }} </p>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-7 col-xs-7 show custom-boards-dropdown form-inline">
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 show custom-boards-dropdown form-inline">
             {% if owner %}
                 <div class="dropdown ml-auto">
-
-              <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button name="MessageBoxModalAlert" class="btn btn-primary" id="btn-board-stream" data-dismiss="modal">Board Stream</button>
+              <a class="btn btn-primary dropdown-toggle ml-2" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Members
               </a>
 
@@ -488,6 +543,7 @@
                 </div>
             {% else %}
               <div class="dropdown ml-auto text-right dropdown-right">
+                  <button name="MessageBoxModalAlert" class="btn btn-primary" id="btn-board-stream" data-dismiss="modal">Board Stream</button>
                   <a class="btn btn-primary dropdown-toggle" href="https://example.com" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                   </a>
@@ -500,11 +556,12 @@
         </div>
 
     </div>
+
     <!--  Board Dynamic Design Stuff -->
     <div class ="outer-wrap">
         <div class="inner-wrap">
             {% for column in columns %}
-            <div class="floatbox">
+            <div class="floatbox transferable-columns" data-value="{{ column.id }}">
               <!-- Column name -->
                    <div id="existing-label-{{column.id}}" class="existing-reactor" data-value="{{ column.id }}">
                       <label data-value="{{ column.id }}" class="existing-label form-control title-column-class non-editable-add-column" placeholder="Add List">{{ column.name }}</label>
@@ -520,7 +577,7 @@
 
                     <hr>
 
-                   
+                <div class="group-cards">
                 {% for card in cards %}
                     {% if card.column == column %}
                       <div id="existing-card-{{column.id}}" data-card_id={{card.id}} class="card-reactor" data-value="{{ column.id }}" data-action="{%url 'boards:get_card_detail' id=board.id %}">
@@ -532,6 +589,7 @@
                     </div>
                     
                 <!-- Add Card -->
+
                       <form  id="existing-form-{{column.id}}"class="existing-form"  data-value="{{ column.id }}"  action="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}">
                           <input id="exist-list-{{column.id}}" class="form-control title-column-class" data-value="{{column.id}}" value="{{card.name}}"> 
                           <button name="AddColumn" type="submit" class="btn btn-success btn-add-list">Update</button> 
@@ -539,17 +597,19 @@
                       </form>
                     {% endif %}
                 {% endfor %}
+                </div>
 
+                <div class="add-card-division">
+                      <div class="add-card-reactor-{{column.id}}">
+                        <label class="form-control title-card-class editable-add-card" data-value="{{column.id}}" placeholder="Add List">Add Card</label>
+                    </div>
 
-                    <div class="add-card-reactor-{{column.id}}">
-                      <label class="form-control title-card-class non-editable-add-card" data-value="{{column.id}}" placeholder="Add List">Add Card</label>
-                  </div>
-
-                  <form id="card-add-form-column-{{column.id}}" class="card-add-form-class toggle-card" action="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}" data-value="{{column.id}}">
-                      <input id="add-card-{{column.id}}" class="form-control title-column-class" placeholder="Enter Another Card Here"> 
-                      <button name="AddColumn" type="submit" class="btn btn-success btn-add-card">Add</button> 
-                      <button id="close-add-card" data-value="{{column.id}}" type="button" class="btn btn-secondary close-add-card">Cancel</button>  
-                  </form>
+                    <form id="card-add-form-column-{{column.id}}" class="card-add-form-class toggle-card" action="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}" data-value="{{column.id}}">
+                        <input id="add-card-{{column.id}}" class="form-control title-column-class" placeholder="Enter Another Card Here"> 
+                        <button name="AddColumn" type="submit" class="btn btn-success btn-add-card">Add</button> 
+                        <button id="close-add-card" data-value="{{column.id}}" type="button" class="btn btn-secondary close-add-card">Cancel</button>  
+                    </form>
+                </div> 
               </div>
             {% endfor %}
               <div class="floatbox">
@@ -567,7 +627,9 @@
                   
         </div>  
     </div>
-</div>
+  </div>
+
+
       <input id="hidden-card-add-values" type="hidden" value="{% url 'boards:add_card' id=board.id %}" data-url="{% url 'boards:add_card' id=board.id %}"></input>
       <input id="hidden-column-archive-values" type="hidden" value="{% url 'boards:archive_column' id=board.id %}" data-url="{% url 'boards:archive_column' id=board.id %}"></input>
       <input id="hidden-column-update-values" type="hidden" value="{% url 'boards:update_column' id=board.id %}" data-url="{% url 'boards:update_column' id=board.id %}"></input>  
@@ -577,5 +639,6 @@
       <input id="hidden-get-card-action" type="hidden" value="{% url 'boards:get_card_detail' id=board.id %}" data-url="{% url 'boards:get_card_detail' id=board.id %}"></input>  
       <input id="hidden-get-assigned-members" type="hidden" data-url="{% url 'boards:get_members' id=board.id %}"></input>
       <input id="hidden-get-due-date" type="hidden" data-url="{% url 'boards:due_date' id=board.id %}"></input>
-      
+      <input id="hidden-transfer-cards" type="hidden" data-url="{% url 'boards:transfer_cards' id=board.id %}"></input>
+      <input id="hidden-activity" type="hidden" data-url="{% url 'boards:get_board_stream' id=board.id %}"></input>
 {% endblock %}

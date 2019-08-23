@@ -7,15 +7,21 @@
 		<link rel="stylesheet" type="text/css" href="{% static '/non-vendors/css/general.css' %}">
 		<link rel="stylesheet" type="text/css" href="{% static '/vendors/jquery-ui-1.12.1/jquery-ui.min.css' %}">
 		 <script src="{% static '/vendors/js/jquery.js' %}"></script>
+		  <script src="{% static '/vendors/js/moment.min.js' %}"></script>
 		<script src="{% static '/vendors/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
 		 <script src="{% static '/vendors/js/popper.js' %}"></script>
 		 <script src="{% static '/vendors/js/bootstrap.min.js' %}"></script>
 		  <script src="{% static '/non-vendors/js/general.js' %}"></script>
-	</head>
-	<body>
-		{% block body %}
 
-		{% endblock %}
+	</head>
+	<body class="{% block body_class %} {% endblock %}">
+
+			{% if user.is_authenticated and not do_not_show %}
+				{% include 'nav_bar.html' %}
+			{% endif %}
+				{% block body %}
+				{% endblock %}
+
 	</body>
 		
 </html>

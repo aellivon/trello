@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import User
 from secrets import token_urlsafe 
+from activity.models import Activity
+from django.contrib.contenttypes.fields import GenericRelation
 
 class Board(models.Model):
     """
@@ -9,9 +11,10 @@ class Board(models.Model):
     name = models.TextField(max_length=30)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     archived = models.BooleanField(default=False)
+    activity = GenericRelation(Activity)
     
     def __str__(self):
-        return "{}-{}".format(self.name , self.owner) 
+        return "{}".format(self.name , self.owner)
 
 
 class BoardMember(models.Model):
@@ -21,6 +24,8 @@ class BoardMember(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     board = models.ForeignKey(Board,on_delete=models.CASCADE)
     is_confirmed = models.BooleanField(default=False)
+    activity = GenericRelation(Activity)
+    archived= models.BooleanField(default=False)
 
     def __str__(self):
         return "{} in {}".format(self.user, self.board)
@@ -33,6 +38,8 @@ class Referral(models.Model):
     board_member = models.ForeignKey(BoardMember,on_delete=models.CASCADE)
     token = models.TextField()
     email = models.TextField()
+    activity = GenericRelation(Activity)
+    archived= models.BooleanField(default=False)
         
     def generate_token(self):
         # Generating secure token using python 3.6 libraries
@@ -52,8 +59,9 @@ class Column(models.Model):
     """
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     name = models.TextField()
-    position = models.IntegerField()
+    position = models.IntegerField(default=0)
     archived = models.BooleanField(default=False)
+    activity = GenericRelation(Activity)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -68,9 +76,15 @@ class Card(models.Model):
     position = models.IntegerField()
     due_date = models.DateTimeField(null=True)
     archived = models.BooleanField(default=False)
+    activity = GenericRelation(Activity)
 
     def __str__(self):
         return "{}".format(self.name)
+
+    # Mabalik na ni sa json
+    @property
+    def is_overdue(self):
+        return True
 
 class CardMember(models.Model):
     """
@@ -78,6 +92,8 @@ class CardMember(models.Model):
     """
     board_member = models.ForeignKey(BoardMember, on_delete=models.CASCADE)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    activity = GenericRelation(Activity)
+    archived = models.BooleanField(default=False)
     
     def __str__(self):
         return "{}-{}".format(self.card.name,self.board_member.user)
@@ -90,6 +106,8 @@ class CardComment(models.Model):
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
     comment = models.TextField()
     date_commented = models.DateTimeField(auto_now_add=True)
+    activity = GenericRelation(Activity)
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return "{}-{}".format(self.user, self.comment)
